@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ProfileScreen from './src/ProfileScreen';
@@ -61,7 +61,9 @@ export default function App() {
         <Stack.Navigator>
           <Stack.Screen name="Home" component={HomeTabs} options={{ headerShown: false }} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{
+            headerLeft:()=>null,
               headerTitle: () => <CustomHeader title="MINERD" />,
+              ...TransitionPresets.BottomSheetAndroid,
             }}/>
         </Stack.Navigator>
       </NavigationContainer>
