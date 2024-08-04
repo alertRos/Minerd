@@ -45,7 +45,7 @@ export default function App() {
             let iconSource;
 
             switch (route.name) {
-              case 'Visits':
+              case 'Visitas':
                 iconSource = require('./assets/icons/visits.png');
                 break;
               case 'Noticias':
@@ -91,7 +91,7 @@ export default function App() {
           },
         })}
       >
-        <Tab.Screen name="Visits" component={Visits} />
+        <Tab.Screen name="Visitas" component={Visits} />
         <Tab.Screen name="Noticias" component={News} />
         <Tab.Screen name="Clima" component={Weather} />
         <Tab.Screen name="Horóscopo" component={Horoscope} />
