@@ -1,16 +1,20 @@
-import { Image, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import Horoscope from './components/Horoscope';
 import News from './components/News';
 import Visits from './components/Visits';
 import Weather from './components/Weather';
 import Profile from './components/Profile';
+import AddVisit from './components/VisitsAdd';
+import VisitDetails from './components/VisitsDetails';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { Image, Text } from 'react-native';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -91,7 +95,15 @@ export default function App() {
           },
         })}
       >
-        <Tab.Screen name="Visits" component={Visits} />
+        <Tab.Screen name="Visits">
+          {() => (
+            <Stack.Navigator>
+              <Stack.Screen name="Visits" component={Visits} />
+              <Stack.Screen name="AddVisit" component={AddVisit} />
+              <Stack.Screen name="VisitDetails" component={VisitDetails} />
+            </Stack.Navigator>
+          )}
+        </Tab.Screen>
         <Tab.Screen name="Noticias" component={News} />
         <Tab.Screen name="Clima" component={Weather} />
         <Tab.Screen name="Horóscopo" component={Horoscope} />
