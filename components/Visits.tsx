@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { TextInput } from 'react-native-paper';
 
 type RootStackParamList = {
   Visits: undefined;
@@ -56,25 +57,39 @@ const Visits = () => {
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.institution}>{item.institution}</Text>
       <Text style={styles.code}>Cod. {item.code}</Text>
-      <Text style={styles.type}>{item.type}</Text>
-      <TouchableOpacity onPress={() => navigation.navigate('VisitDetails')}>
-        <Text style={styles.detailsButton}>Detalles</Text>
-      </TouchableOpacity>
+      <View style={styles.cardGroup}>
+        <Text style={styles.type}>{item.type}</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('VisitDetails')} style={styles.detailsButtonContainer}>
+          <Text style={styles.detailsButton}>Detalles</Text>
+          <Image 
+            source={require('../assets/icons/rowBlue.png')} 
+            style={styles.icono}
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.container}>
-      <Image source={require('../assets/icons/minerd.png')} style={{width:208, height: 43, marginTop: 38}}/>
-      <View style={styles.body}>
-        <Text style={{color: 'red', fontWeight: 'bold', fontSize: 25, textAlign: 'center'}}>Pon aquí lo que te toca chica superpoderosa 👁️🫦👁️💅</Text>
+      <Image source={require('../assets/icons/minerd.png')} style={styles.logo} />
+      <View style={styles.titleGroup}>
+        <Text style={styles.perfilText}>Perfil</Text>
+        <TouchableOpacity activeOpacity={0.5} style={styles.editButton} onPress={() => {}}>
+          <Image source={require('../assets/icons/map.png')} style={styles.editImage} />
+        </TouchableOpacity>
       </View>
-    </View>
+      <TextInput 
+        mode="outlined"
+        placeholder="Buscar"
+        right={<TextInput.Icon icon={"magnify"} color={"gray"}/>}
+        style={styles.input}
+      />
       <FlatList
         data={visitsData}
         renderItem={renderItem}
         keyExtractor={item => item.id}
+        contentContainerStyle={styles.flatListContent}
       />
       <TouchableOpacity
         style={styles.addButton}
@@ -87,13 +102,49 @@ const Visits = () => {
 };
 
 const styles = StyleSheet.create({
-  body:{
-    paddingTop: 40
-  },
   container: {
     flex: 1,
-    padding: 25,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  icono: {
+    width: 20,
+    height: 20,
+  },
+  logo: {
+    width: 208,
+    height: 43,
+    marginTop: 20,
+  },
+  titleGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  input: {
+    height: 44,
+    width: '100%',
+    marginVertical: 8,
+    fontFamily: 'alata-regular',
+    fontSize: 24,
+  },
+  perfilText: {
+    fontSize: 24,
+    fontWeight: '400',
+    lineHeight: 33.12,
+    color: '#17202A',
+    fontFamily: 'alata-regular',
+    flex: 1,
+  },
+  editButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editImage: {
+    width: 24,
+    height: 24,
   },
   visitItem: {
     marginBottom: 20,
@@ -105,6 +156,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 2,
+  },
+  cardGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    marginBottom: 20,
   },
   date: {
     fontSize: 14,
@@ -126,9 +184,17 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   type: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#f00',
-    marginBottom: 10,
+    textAlign: 'center',
+  },
+  detailsButtonContainer: {
+    borderColor: '#0071BD', // Borde azul
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    flexDirection: 'row',
   },
   detailsButton: {
     fontSize: 16,
@@ -136,19 +202,21 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: 'absolute',
-    bottom: 30,
+    bottom: 100,
     right: 30,
-    backgroundColor: '#007bff',
+    backgroundColor: '#DC3545',
     width: 60,
     height: 60,
-    borderRadius: 30,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   addButtonText: {
-    fontSize: 36,
+    fontSize: 34,
     color: '#fff',
-    lineHeight: 36,
+  },
+  flatListContent: {
+    paddingBottom: 80, // Ajusta este valor según el tamaño de tu bottom navbar
   },
 });
 

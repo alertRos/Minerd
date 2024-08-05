@@ -95,12 +95,12 @@ export default function App() {
           },
         })}
       >
-        <Tab.Screen name="Visits">
+        <Tab.Screen name="Visitas">
           {() => (
             <Stack.Navigator>
-              <Stack.Screen name="Visits" component={Visits} />
-              <Stack.Screen name="AddVisit" component={AddVisit} />
-              <Stack.Screen name="VisitDetails" component={VisitDetails} />
+              <Stack.Screen name="Visits" component={Visits} options={{ headerShown: false }} />
+              <Stack.Screen name="AddVisit" component={AddVisit} options={{ headerShown: false }} />
+              <Stack.Screen name="VisitDetails" component={VisitDetails} options={{ headerShown: false }} />
             </Stack.Navigator>
           )}
         </Tab.Screen>
