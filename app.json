@@ -25,6 +25,9 @@
     },
     "fonts": {
       "alata-regular": "./assets/fonts/Alata-Regular.ttf"
-    }
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
