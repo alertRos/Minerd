@@ -3,8 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App'; 
-import { Dropdown } from 'react-native-element-dropdown';
-import { createUser } from '../MinerdDb'; 
+import { Dropdown } from 'react-native-element-dropdown'; 
 
 type OnboardingSignoNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingSigno'>;
 
@@ -42,7 +41,6 @@ const OnboardingSigno = ({ navigation, route }: Props) => {
   const handleContinue = () => {
     if (value) {
       const { nombre, apellido, matricula, frase } = route.params;
-      createUser('', nombre, apellido, matricula, frase, value); 
       navigation.navigate('OnboardingFinish', {
         nombre,
         apellido,

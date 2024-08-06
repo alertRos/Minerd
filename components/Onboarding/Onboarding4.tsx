@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
 
-type OnboardingPageNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingPage'>;
+type OnboardingFinishNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingFinish'>;
 
 type Props = {
   route: {
@@ -16,7 +16,7 @@ type Props = {
       signo: string;
     };
   };
-  navigation: OnboardingPageNavigationProp;
+  navigation: OnboardingFinishNavigationProp;
 };
 
 const OnboardingFinish = ({ route, navigation }: Props) => {

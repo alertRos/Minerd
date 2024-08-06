@@ -13,7 +13,7 @@ import Horoscope from './components/Horoscope/Horoscope';
 import News from './components/News';
 import Visits from './components/Visits';
 import Weather from './components/Weather';
-import { hasUsers } from './components/MinerdDb';
+import { hasUsers, initializeDatabase } from './components/MinerdDb';
 import ProfileScreen from './components/Profile/ProfileScreen';
 import EditProfile from './components/Profile/editProfile';
 
@@ -47,6 +47,7 @@ export type MainTabsParamList = {
 
 const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabsParamList>();
+initializeDatabase();
 
 function MainTabs() {
   return (
@@ -172,6 +173,8 @@ export default function App() {
               <Stack.Screen name="OnboardingCreatePage" component={OnboardingCreatePage} />
               <Stack.Screen name="OnboardingSigno" component={OnboardingSigno} />
               <Stack.Screen name="OnboardingFinish" component={OnboardingFinish} />
+              <Stack.Screen name="MainApp" component={MainTabs} />
+              <Stack.Screen name="EditProfile" component={EditProfile} /> 
             </>
           ) : (
             <>
