@@ -1,15 +1,13 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '../UserService';
 
-type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditProfile'>;
-
-type Props = {
-  navigation: ProfileScreenNavigationProp;
-};
-
-export default function ProfileScreen({ navigation }: Props) {
+export default function ProfileScreen({ navigation }: any) {
+  const [cedula, setCedula] = useState('');
+  const [clave, setClave] = useState('');
+  const user = useUser(cedula, clave);
+  
   return (
     <View style={styles.container}>
       <View style={styles.titlegroup}>
@@ -27,8 +25,8 @@ export default function ProfileScreen({ navigation }: Props) {
       </View>
       <View style={styles.profiledata}>
         <Image source={require('../../assets/profileimage.png')} style={styles.profileImg} />
-        <Text style={styles.profileName}>Mojo Jojo</Text>
-        <Text style={styles.profileID}>2025-1998</Text>
+        <Text style={styles.profileName}>{user?.nombre || 'Nombre'}</Text>
+        <Text style={styles.profileID}>{cedula}</Text>
         <View style={styles.card}>
           <Text style={styles.TextCard}>“Que Leny no toque mis diseños”</Text>
         </View>

@@ -3,9 +3,8 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
-import { createUser, initializeDatabase } from '../MinerdDb';
 
-type OnboardingPageNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingPage'>;
+type OnboardingFinishNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingFinish'>;
 
 type Props = {
   route: {
@@ -17,16 +16,10 @@ type Props = {
       signo: string;
     };
   };
-  navigation: OnboardingPageNavigationProp;
+  navigation: OnboardingFinishNavigationProp;
 };
 
 const OnboardingFinish = ({ route, navigation }: Props) => {
-  React.useEffect(() => {
-    initializeDatabase();
-    const { nombre, apellido, matricula, frase, signo } = route.params;
-    createUser('', nombre, apellido, matricula, frase, signo);
-  }, [route.params]);
-
   return (
     <View style={styles.container}>
       <LinearGradient

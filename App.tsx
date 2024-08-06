@@ -1,56 +1,49 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { Image, Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, RouteProp } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-
 import OnboardingPage from './components/Onboarding/Onboarding';
-import OnboardingCreatePage from './components/Onboarding/Onboarding2';
+import Login from './components/Onboarding/Login';
 import OnboardingSigno from './components/Onboarding/Onboarding3';
-import OnboardingFinish from './components/Onboarding/Onboarding4';
-
-import Horoscope from './components/Horoscope/Horoscope';
 import News from './components/News';
 import Visits from './components/Visits';
 import Weather from './components/Weather';
-import { hasUsers } from './components/MinerdDb';
+import Register from './components/Onboarding/Register';
+import { RestorePassword } from './components/Onboarding/RestorePassword';
+import Horoscope from './components/Horoscope/Horoscope';
 import ProfileScreen from './components/Profile/ProfileScreen';
+import CustomHeader from './components/CustomHeader';
+import { TransitionPresets } from '@react-navigation/stack';
+import * as SplashScreen from 'expo-splash-screen';
 import EditProfile from './components/Profile/editProfile';
+
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+SplashScreen.preventAutoHideAsync();
 
 export type RootStackParamList = {
   OnboardingPage: undefined;
   OnboardingCreatePage: undefined;
-  OnboardingSigno: {
-    nombre: string;
-    apellido: string;
-    matricula: string;
-    frase: string;
-  };
-  OnboardingFinish: {
-    nombre: string;
-    apellido: string;
-    matricula: string;
-    frase: string;
-    signo: string;
-  };
-  MainApp: undefined;
-  EditProfile: undefined; // Añadido aquí
+  OnboardingSigno: undefined;
+  OnboardingFinish: undefined;
+  Login: undefined; 
+  MainApp: { cedula: string, clave: string }; // Ajustado aquí
+  Register: undefined;
+  RestorePassword: undefined;
+  EditProfile: undefined;
 };
 
-export type MainTabsParamList = {
-  Visitas: undefined;
-  Noticias: undefined;
-  Clima: undefined;
-  Horóscopo: undefined;
-  Perfil: undefined;
+type MainTabsProps = {
+  route?: RouteProp<RootStackParamList, 'MainApp'>;
+  navigation?: any;
 };
 
-const Stack = createStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator<MainTabsParamList>();
+const MainTabs: React.FC<MainTabsProps> = ({ route }) => {
+  const { cedula, clave } = route?.params || {};
 
-function MainTabs() {
   return (
     <Tab.Navigator
       initialRouteName="Visitas"
@@ -106,42 +99,19 @@ function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="Visitas" component={Visits} />
-      <Tab.Screen name="Noticias" component={News} />
-      <Tab.Screen name="Clima" component={Weather} />
-      <Tab.Screen name="Horóscopo" component={Horoscope} />
-      <Tab.Screen name="Perfil" component={ProfileScreen} />
+      <Tab.Screen name="Visitas" component={Visits} initialParams={{ cedula, clave }} />
+      <Tab.Screen name="Noticias" component={News} initialParams={{ cedula, clave }} />
+      <Tab.Screen name="Clima" component={Weather} initialParams={{ cedula, clave }} />
+      <Tab.Screen name="Horóscopo" component={Horoscope} initialParams={{ cedula, clave }} />
+      <Tab.Screen name="Perfil" component={ProfileScreen} initialParams={{ cedula, clave }} />
     </Tab.Navigator>
   );
-}
+};
 
-// Componente principal de la aplicación
 export default function App() {
   const [fontsLoaded] = useFonts({
     'alata-regular': require('./assets/fonts/Alata-Regular.ttf'),
   });
-
-  const [initialRoute, setInitialRoute] = useState<'OnboardingPage' | 'MainApp'>('OnboardingPage');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const userExists = await hasUsers();
-        if (userExists) {
-          setInitialRoute('MainApp');
-        } else {
-          setInitialRoute('OnboardingPage');
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error('Error checking if user exists:', error);
-        setLoading(false);
-      }
-    };
-
-    checkUser();
-  }, []);
 
   useEffect(() => {
     const hideSplashScreen = async () => {
@@ -159,27 +129,32 @@ export default function App() {
     }
   }, [fontsLoaded]);
 
-  if (loading) {
-    return <Text style={{ textAlign: 'center', marginTop: 20 }}>Cargando...</Text>;
+  if (!fontsLoaded) {
+    return null; 
   }
 
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {initialRoute === 'OnboardingPage' ? (
-            <>
-              <Stack.Screen name="OnboardingPage" component={OnboardingPage} />
-              <Stack.Screen name="OnboardingCreatePage" component={OnboardingCreatePage} />
-              <Stack.Screen name="OnboardingSigno" component={OnboardingSigno} />
-              <Stack.Screen name="OnboardingFinish" component={OnboardingFinish} />
-            </>
-          ) : (
-            <>
-              <Stack.Screen name="MainApp" component={MainTabs} />
-              <Stack.Screen name="EditProfile" component={EditProfile} /> 
-            </>
-          )}
+          <Stack.Screen name="OnboardingPage" component={OnboardingPage} />
+          <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="RestorePassword" component={RestorePassword} />
+          <Stack.Screen 
+            name="MainApp" 
+            component={MainTabs} 
+            initialParams={{ cedula: '', clave: '' }} 
+          />
+          <Stack.Screen 
+            name="EditProfile" 
+            component={EditProfile} 
+            options={{
+              headerLeft: () => null,
+              headerTitle: () => <CustomHeader title="MINERD" />,
+              ...TransitionPresets.BottomSheetAndroid,
+            }} 
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </View>

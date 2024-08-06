@@ -1,16 +1,8 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
 
-type OnboardingPageNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingPage'>;
-
-type Props = {
-  navigation: OnboardingPageNavigationProp;
-};
-
-const OnboardingPage = ({ navigation }: Props) => {
+export default function OnboardingPage({ navigation }: any) {
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -28,7 +20,7 @@ const OnboardingPage = ({ navigation }: Props) => {
         />
         <Text style={styles.text}>¡Bienvenido, técnico!</Text>
       </View>
-      <TouchableOpacity style={styles.continuarButton} onPress={() => navigation.navigate('OnboardingCreatePage')}>
+      <TouchableOpacity style={styles.continuarButton}  onPress={() => navigation.navigate('Login')}>
         <Text style={styles.continuarButtonText}>Continuar</Text>
         <Image 
           source={require('../../assets/rowBlue.png')} 
@@ -95,4 +87,3 @@ const styles = StyleSheet.create({
   }
 });
 
-export default OnboardingPage;
