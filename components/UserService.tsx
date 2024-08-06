@@ -34,3 +34,4 @@ export const useUser = (cedula: string, clave: string) => {
 
   return user;
 };
+

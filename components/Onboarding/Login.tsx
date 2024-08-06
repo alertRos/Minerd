@@ -17,7 +17,7 @@ export default function Login({ navigation }: any) {
 
         navigation.navigate('MainApp', { cedula, clave });
       } else {
-        console.log( result.mensaje);
+        Alert.alert('Error', result.mensaje);
       }
     } catch (error) {
       Alert.alert('Error', 'Ocurrió un error al intentar iniciar sesión. Por favor, intente nuevamente.');

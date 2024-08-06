@@ -1,32 +1,64 @@
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 import zodiacSigns from './Zodiac';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getZodiacSign } from './HoroscopeService';
+import { useUser } from '../UserService';
 
 const Horoscope = () => {
-  const [sign, setSign] = useState('libra');
+  const [sign, setSign] = useState('taurus');
   const [horoscope, setHoroscope] = useState('');
   const [week, setWeek] = useState('');
+  const [cedula, setCedula] = useState('');
+  const [clave, setClave] = useState('');
   const zodiacSign = zodiacSigns[sign];
+  const user = useUser(cedula, clave);
+
+  useEffect(() => {
+    const loadCredentials = async () => {
+      try {
+        const storedCedula = await AsyncStorage.getItem('cedula');
+        const storedClave = await AsyncStorage.getItem('clave');
+        if (storedCedula !== null && storedClave !== null) {
+          setCedula(storedCedula);
+          setClave(storedClave);
+        } else {
+          console.warn('Credenciales no encontradas en AsyncStorage');
+        }
+      } catch (error) {
+        console.error('Error recuperando credenciales:', error);
+      }
+    };
+
+    loadCredentials();
+  }, []);
+
+  useEffect(() => {
+    if (user?.fecha_nacimiento) {
+      const newSign = getZodiacSign(user.fecha_nacimiento);
+      setSign(newSign);
+    }
+  }, [user?.fecha_nacimiento]);
 
   async function Translate(text: string) {
     const url = `https://translation.googleapis.com/language/translate/v2?key=AIzaSyBk-IQ31D_N5_UrCmb53SDvq_iylzkMYf8`;
 
     const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            q: text,
-            target: 'es', 
-            source: 'en'  
-        }),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        q: text,
+        target: 'es', 
+        source: 'en'  
+      }),
     });
 
     if (!response.ok) {
-        throw new Error('Error en la solicitud ' + response.statusText);
+      throw new Error('Error en la solicitud ' + response.statusText);
     }
 
     const data = await response.json();
@@ -39,8 +71,8 @@ const Horoscope = () => {
       let responseHoroscope = response.data.data.horoscope_data;
       let responseWeekly = response.data.data.week;
 
-      responseHoroscope = Translate(responseHoroscope)
-      responseWeekly = Translate(responseWeekly)
+      responseHoroscope = await Translate(responseHoroscope);
+      responseWeekly = await Translate(responseWeekly);
       setHoroscope(responseHoroscope);
       setWeek(responseWeekly);
     } catch (error) {
@@ -51,7 +83,7 @@ const Horoscope = () => {
   useFocusEffect(
     React.useCallback(() => {
       getHoroscopeWeekly();
-    }, [])
+    }, [sign]) 
   );
 
   return (

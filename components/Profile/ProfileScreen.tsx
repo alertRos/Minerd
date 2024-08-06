@@ -7,27 +7,7 @@ export default function ProfileScreen({ navigation }: any) {
   const [cedula, setCedula] = useState('');
   const [clave, setClave] = useState('');
   const user = useUser(cedula, clave);
-
-  useEffect(() => {
-    const loadCredentials = async () => {
-      try {
-        const storedCedula = await AsyncStorage.getItem('cedula');
-        const storedClave = await AsyncStorage.getItem('clave');
-        if (storedCedula !== null && storedClave !== null) {
-          setCedula(storedCedula);
-          setClave(storedClave);
-        } else {
-          // Manejar el caso en el que no se encuentran las credenciales
-          console.warn('Credenciales no encontradas en AsyncStorage');
-        }
-      } catch (error) {
-        console.error('Error recuperando credenciales:', error);
-      }
-    };
-
-    loadCredentials();
-  }, []);
-
+  
   return (
     <View style={styles.container}>
       <View style={styles.titlegroup}>
