@@ -1,16 +1,30 @@
-import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
+import { LinearGradient } from 'expo-linear-gradient';
 
-type OnboardingPageNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingCreatePage'>;
+type OnboardingPageNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingSigno'>;
 
 type Props = {
   navigation: OnboardingPageNavigationProp;
 };
 
 export default function OnboardingCreatePage({ navigation }: Props) {
+  const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
+  const [matricula, setMatricula] = useState('');
+  const [frase, setFrase] = useState('');
+
+  const handleContinue = () => {
+    navigation.navigate('OnboardingSigno', {
+      nombre,
+      apellido,
+      matricula,
+      frase,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -24,7 +38,10 @@ export default function OnboardingCreatePage({ navigation }: Props) {
       <Text style={styles.headerText}>Actualiza tu perfil</Text>
       <View style={styles.profiledata}>
         <View style={styles.profileImgContainer}>
-          <Image source={require('../../assets/perfildefault.png')} style={styles.profileImg} />
+          <Image 
+            source={require('../../assets/perfildefault.png')} 
+            style={styles.profileImg} 
+          />
           <TouchableOpacity 
             activeOpacity={0.7}
             style={styles.cameraButton} 
@@ -36,26 +53,34 @@ export default function OnboardingCreatePage({ navigation }: Props) {
             />
           </TouchableOpacity>
         </View>
-        <TextInput 
-          style={styles.input} 
+        <TextInput
+          style={styles.input}
           placeholder="Nombre"
+          value={nombre}
+          onChangeText={setNombre}
         />
-        <TextInput 
+        <TextInput
           style={styles.input}
           placeholder="Apellido"
+          value={apellido}
+          onChangeText={setApellido}
         />
-        <TextInput 
+        <TextInput
           style={styles.input}
           placeholder="Matricula"
           keyboardType='numeric'
+          value={matricula}
+          onChangeText={setMatricula}
         />
-        <TextInput 
+        <TextInput
           style={styles.textArea}
           placeholder="Reflexión o frase..."
           multiline
           numberOfLines={4}
+          value={frase}
+          onChangeText={setFrase}
         />
-        <TouchableOpacity style={styles.continuarButton} onPress={() => navigation.navigate('OnboardingSigno')}>
+        <TouchableOpacity style={styles.continuarButton} onPress={handleContinue}>
           <Text style={styles.continuarButtonText}>Continuar</Text>
           <Image 
             source={require('../../assets/rowWhite.png')} 
@@ -114,7 +139,7 @@ const styles = StyleSheet.create({
     height: 110,
     width: 110,
     borderRadius: 55,
-    backgroundColor:'#D5D8DC'
+    backgroundColor: '#D5D8DC',
   },
   input: {
     height: 44,
@@ -138,14 +163,13 @@ const styles = StyleSheet.create({
     elevation: 6,
     width: '100%',
     maxWidth: 339,
-    height: 100, 
+    height: 100,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    textAlign:'center',
     fontFamily: 'alata-regular',
   },
   continuarButton: {
-    marginVertical:20,
+    marginVertical: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -159,7 +183,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
-    flex: 1, 
+    flex: 1,
     textAlign: 'center',
     fontFamily: 'alata-regular',
   },
@@ -169,7 +193,7 @@ const styles = StyleSheet.create({
   },
   cameraButton: {
     position: 'absolute',
-    backgroundColor:'#0071BD',
+    backgroundColor: '#0071BD',
     bottom: -4,
     left: 70,
     borderRadius: 50,

@@ -1,16 +1,32 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import React from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
+import { createUser, initializeDatabase } from '../MinerdDb';
 
 type OnboardingPageNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingPage'>;
 
 type Props = {
+  route: {
+    params: {
+      nombre: string;
+      apellido: string;
+      matricula: string;
+      frase: string;
+      signo: string;
+    };
+  };
   navigation: OnboardingPageNavigationProp;
 };
 
-const OnboardingFinish = ({ navigation }: Props) => {
+const OnboardingFinish = ({ route, navigation }: Props) => {
+  React.useEffect(() => {
+    initializeDatabase();
+    const { nombre, apellido, matricula, frase, signo } = route.params;
+    createUser('', nombre, apellido, matricula, frase, signo);
+  }, [route.params]);
+
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -72,7 +88,7 @@ const styles = StyleSheet.create({
   },
   continuarButton: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FDFEFE',
     borderRadius: 10,
@@ -84,7 +100,6 @@ const styles = StyleSheet.create({
     color: '#0071BD',
     fontSize: 18,
     fontWeight: 'bold',
-    flex: 1,
     textAlign: 'center',
     fontFamily: 'alata-regular',
   },

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Image, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -16,24 +16,42 @@ import News from './components/News';
 import Visits from './components/Visits';
 import Weather from './components/Weather';
 import Profile from './components/Profile';
-
-const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
-
-SplashScreen.preventAutoHideAsync();
+import { hasUsers } from './components/MinerdDb';
 
 export type RootStackParamList = {
   OnboardingPage: undefined;
   OnboardingCreatePage: undefined;
-  OnboardingSigno: undefined;
-  OnboardingFinish: undefined;
+  OnboardingSigno: {
+    nombre: string;
+    apellido: string;
+    matricula: string;
+    frase: string;
+  };
+  OnboardingFinish: {
+    nombre: string;
+    apellido: string;
+    matricula: string;
+    frase: string;
+    signo: string;
+  };
   MainApp: undefined;
 };
+
+export type MainTabsParamList = {
+  Visitas: undefined;
+  Noticias: undefined;
+  Clima: undefined;
+  Horóscopo: undefined;
+  Perfil: undefined;
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<MainTabsParamList>();
 
 function MainTabs() {
   return (
     <Tab.Navigator
-      initialRouteName="Visits"
+      initialRouteName="Visitas"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
@@ -95,10 +113,33 @@ function MainTabs() {
   );
 }
 
+// Componente principal de la aplicación
 export default function App() {
   const [fontsLoaded] = useFonts({
     'alata-regular': require('./assets/fonts/Alata-Regular.ttf'),
   });
+
+  const [initialRoute, setInitialRoute] = useState<'OnboardingPage' | 'MainApp'>('OnboardingPage');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const userExists = await hasUsers();
+        if (userExists) {
+          setInitialRoute('MainApp');
+        } else {
+          setInitialRoute('OnboardingPage');
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Error checking if user exists:', error);
+        setLoading(false);
+      }
+    };
+
+    checkUser();
+  }, []);
 
   useEffect(() => {
     const hideSplashScreen = async () => {
@@ -116,19 +157,24 @@ export default function App() {
     }
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) {
-    return null; // O muestra una pantalla de carga
+  if (loading) {
+    return <Text style={{ textAlign: 'center', marginTop: 20 }}>Cargando...</Text>;
   }
 
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="OnboardingPage" component={OnboardingPage} />
-          <Stack.Screen name="OnboardingCreatePage" component={OnboardingCreatePage} />
-          <Stack.Screen name="OnboardingSigno" component={OnboardingSigno} />
-          <Stack.Screen name="OnboardingFinish" component={OnboardingFinish} />
-          <Stack.Screen name="MainApp" component={MainTabs} />
+          {initialRoute === 'OnboardingPage' ? (
+            <>
+              <Stack.Screen name="OnboardingPage" component={OnboardingPage} />
+              <Stack.Screen name="OnboardingCreatePage" component={OnboardingCreatePage} />
+              <Stack.Screen name="OnboardingSigno" component={OnboardingSigno} />
+              <Stack.Screen name="OnboardingFinish" component={OnboardingFinish} />
+            </>
+          ) : (
+            <Stack.Screen name="MainApp" component={MainTabs} />
+          )}
         </Stack.Navigator>
       </NavigationContainer>
     </View>

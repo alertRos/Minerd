@@ -1,15 +1,23 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
+import { RootStackParamList } from '../../App'; 
 import { Dropdown } from 'react-native-element-dropdown';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import { createUser } from '../MinerdDb'; 
 
-type OnboardingPageNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingSigno'>;
+type OnboardingSignoNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingSigno'>;
 
 type Props = {
-  navigation: OnboardingPageNavigationProp;
+  navigation: OnboardingSignoNavigationProp;
+  route: {
+    params: {
+      nombre: string;
+      apellido: string;
+      matricula: string;
+      frase: string;
+    };
+  };
 };
 
 const data = [
@@ -27,9 +35,23 @@ const data = [
   { label: 'Piscis', value: 'piscis' },
 ];
 
-const OnboardingSigno = ({ navigation }: Props) => {
+const OnboardingSigno = ({ navigation, route }: Props) => {
   const [value, setValue] = useState<string | null>(null);
   const [isFocus, setIsFocus] = useState<boolean>(false);
+
+  const handleContinue = () => {
+    if (value) {
+      const { nombre, apellido, matricula, frase } = route.params;
+      createUser('', nombre, apellido, matricula, frase, value); 
+      navigation.navigate('OnboardingFinish', {
+        nombre,
+        apellido,
+        matricula,
+        frase,
+        signo: value, 
+      });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -72,7 +94,7 @@ const OnboardingSigno = ({ navigation }: Props) => {
         />
         <TouchableOpacity 
           style={styles.continuarButton} 
-          onPress={() => navigation.navigate('OnboardingFinish')}
+          onPress={handleContinue}
           accessibilityLabel="Continuar a la siguiente pantalla"
         >
           <Text style={styles.continuarButtonText}>Continuar</Text>
@@ -155,8 +177,8 @@ const styles = StyleSheet.create({
     height: 32,
   },
   dropdown: {
-    height: 43, // Increased height for better visibility
-    width:329,
+    height: 43, // Ajustado para mejor visibilidad
+    width: 329,
     borderColor: '#D5D8DC',
     borderWidth: 1,
     borderRadius: 8,
@@ -179,7 +201,7 @@ const styles = StyleSheet.create({
   selectedTextStyle: {
     fontSize: 24,
     color: '#17202A',
-    lineHeight:33,
+    lineHeight: 33,
   },
   inputSearchStyle: {
     height: 40,
