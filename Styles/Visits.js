@@ -24,6 +24,8 @@ const StyleViews = StyleSheet.create({
     color: '#FDFEFE',
     textAlign: 'center',
     fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 10,
     
   },
   dateCloseRow: {
@@ -31,6 +33,7 @@ const StyleViews = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 10,
+    marginBottom: 20,
     width: '100%',
     paddingHorizontal: 20,
     
@@ -48,6 +51,7 @@ const StyleViews = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#f8f9fa',
     color: '#495057',
+    fontSize: 20,
     
   },
   locationLabel: {
@@ -78,7 +82,7 @@ const StyleViews = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
-    marginBottom: 20,
+    marginBottom: 80,
     
   },
   fileButton: {
@@ -90,27 +94,36 @@ const StyleViews = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 5,
     backgroundColor: '#f8f9fa',
-    
+    height: 101,
+    justifyContent: 'center',
   },
   saveButton: {
     backgroundColor: '#007bff',
     paddingVertical: 12,
     borderRadius: 8,
-    
+    bottom: 65,
+    marginTop: 10,
+    marginBottom: 10,
+    height: 65.13,
+    justifyContent: "center",
   },
   saveButtonText: {
     color: '#fff',
     textAlign: 'center',
     fontSize: 18,
     fontWeight: 'bold',
-    
-    
+    fontSize: 24,
   },
   Testt: {
     borderTopRightRadius: 16,
     borderTopLeftRadius: 16,
     backgroundColor: '#fff', // Color de fondo para verificar la aplicación del estilo
     overflow: 'hidden', // Para recortar contenido
+  },
+  Inputs: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    
   }
 });
 

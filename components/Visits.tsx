@@ -8,7 +8,7 @@ import StyleViews from '../Styles/Visits';
 
 SplashScreen.preventAutoHideAsync();
 
-const Visits = () => {
+const VisitsCB = () => {
   const [isReady, setIsReady] = useState(false);
   const [title, setTitle] = useState('');
   const [motivoCode, setMotivoCode] = useState('');
@@ -49,15 +49,18 @@ const Visits = () => {
 <View style={StyleViews.dateCloseRow}>
     <Text style={[StyleViews.date, { fontFamily: 'Alata_400Regular' }]}>14 de Agosto 2024 03:42 PM</Text>
     <TouchableOpacity>
-      <Ionicons name="close" size={24} color="#17202A" />
+      <Ionicons name="close" size={35} color="#17202A" />
     </TouchableOpacity>
   </View>
+
+  <View style={StyleViews.Inputs}>
       <TextInput 
         style={[StyleViews.input, { fontFamily: 'Alata_400Regular' }]} 
         placeholder="Título" 
         value={title} 
         onChangeText={setTitle} 
       />
+      
       <TextInput 
         style={[StyleViews.input, { fontFamily: 'Alata_400Regular' }]} 
         placeholder="Motivo de la visita" 
@@ -109,10 +112,10 @@ const Visits = () => {
         value={directorName} 
         onChangeText={setDirectorName} 
       />
-
+        
       <Text style={[StyleViews.subHeader, { fontFamily: 'Alata_400Regular' }]}>Detalles</Text>
       <TextInput 
-        style={[StyleViews.input, { fontFamily: 'Alata_400Regular' }]} 
+        style={[StyleViews.input, { fontFamily: 'Alata_400Regular', height: 109, textAlign: "center" }]}  
         placeholder="Comentario sobre la visita..." 
         value={comment} 
         onChangeText={setComment} 
@@ -121,10 +124,10 @@ const Visits = () => {
 
       <View style={StyleViews.fileSection}>
         <TouchableOpacity style={StyleViews.fileButton}>
-          <Text>Foto</Text>
+        <Image source={require('../assets/icons/image.png')} />
         </TouchableOpacity>
         <TouchableOpacity style={StyleViews.fileButton}>
-          <Text>Nota de Voz</Text>
+        <Image source={require('../assets/icons/headphones.png')} />
         </TouchableOpacity>
       </View>
 
@@ -132,10 +135,10 @@ const Visits = () => {
         <Text style={StyleViews.saveButtonText}>Guardar</Text>
       </TouchableOpacity>
       </View>
+      </View>
     </ScrollView>
   );
 }
 
-export default Visits;
+export default VisitsCB;
 
-export default Visits;
