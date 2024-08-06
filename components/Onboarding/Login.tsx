@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login({ navigation }: any) {
   const [cedula, setCedula] = useState('');
@@ -11,9 +12,12 @@ export default function Login({ navigation }: any) {
       const result = await response.json();
 
       if (result.exito) {
-        navigation.navigate('MainApp');
+        await AsyncStorage.setItem('cedula', cedula);
+        await AsyncStorage.setItem('clave', clave);
+
+        navigation.navigate('MainApp', { cedula, clave });
       } else {
-        Alert.alert('Error', result.mensaje);
+        console.log( result.mensaje);
       }
     } catch (error) {
       Alert.alert('Error', 'Ocurrió un error al intentar iniciar sesión. Por favor, intente nuevamente.');
