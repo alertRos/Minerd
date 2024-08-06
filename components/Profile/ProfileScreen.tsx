@@ -1,9 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '../UserService';
 
 export default function ProfileScreen({ navigation }: any) {
+  const [cedula, setCedula] = useState('');
+  const [clave, setClave] = useState('');
+  const user = useUser(cedula, clave);
+
+  useEffect(() => {
+    const loadCredentials = async () => {
+      try {
+        const storedCedula = await AsyncStorage.getItem('cedula');
+        const storedClave = await AsyncStorage.getItem('clave');
+        if (storedCedula !== null && storedClave !== null) {
+          setCedula(storedCedula);
+          setClave(storedClave);
+        } else {
+          // Manejar el caso en el que no se encuentran las credenciales
+          console.warn('Credenciales no encontradas en AsyncStorage');
+        }
+      } catch (error) {
+        console.error('Error recuperando credenciales:', error);
+      }
+    };
+
+    loadCredentials();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.titlegroup}>
@@ -21,8 +45,8 @@ export default function ProfileScreen({ navigation }: any) {
       </View>
       <View style={styles.profiledata}>
         <Image source={require('../../assets/profileimage.png')} style={styles.profileImg} />
-        <Text style={styles.profileName}>Mojo Jojo</Text>
-        <Text style={styles.profileID}>2025-1998</Text>
+        <Text style={styles.profileName}>{user?.nombre || 'Nombre'}</Text>
+        <Text style={styles.profileID}>{cedula}</Text>
         <View style={styles.card}>
           <Text style={styles.TextCard}>“Que Leny no toque mis diseños”</Text>
         </View>
@@ -33,6 +57,7 @@ export default function ProfileScreen({ navigation }: any) {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

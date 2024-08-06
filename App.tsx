@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from 'react';
 import { Image, Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, RouteProp } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useFonts } from 'expo-font';
@@ -13,14 +13,11 @@ import Weather from './components/Weather';
 import Register from './components/Onboarding/Register';
 import { RestorePassword } from './components/Onboarding/RestorePassword';
 import Horoscope from './components/Horoscope/Horoscope';
-import EditProfile from './components/Profile/editProfile';
-import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import * as Font from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
 import ProfileScreen from './components/Profile/ProfileScreen';
 import CustomHeader from './components/CustomHeader';
-import {TransitionPresets } from '@react-navigation/stack';
+import { TransitionPresets } from '@react-navigation/stack';
+import * as SplashScreen from 'expo-splash-screen';
+import EditProfile from './components/Profile/editProfile';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -32,14 +29,24 @@ export type RootStackParamList = {
   OnboardingCreatePage: undefined;
   OnboardingSigno: undefined;
   OnboardingFinish: undefined;
-  LoginPage: undefined; // Nueva ruta para inicio de sesión
-  MainApp: undefined;
+  Login: undefined; 
+  MainApp: { cedula: string, clave: string }; // Ajustado aquí
+  Register: undefined;
+  RestorePassword: undefined;
+  EditProfile: undefined;
 };
 
-function MainTabs() {
+type MainTabsProps = {
+  route?: RouteProp<RootStackParamList, 'MainApp'>;
+  navigation?: any;
+};
+
+const MainTabs: React.FC<MainTabsProps> = ({ route }) => {
+  const { cedula, clave } = route?.params || {};
+
   return (
     <Tab.Navigator
-      initialRouteName="Visits"
+      initialRouteName="Visitas"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
@@ -92,14 +99,14 @@ function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="Visitas" component={Visits} />
-      <Tab.Screen name="Noticias" component={News} />
-      <Tab.Screen name="Clima" component={Weather} />
-      <Tab.Screen name="Horóscopo" component={Horoscope} />
-      <Tab.Screen name="Perfil" component={ProfileScreen} />
+      <Tab.Screen name="Visitas" component={Visits} initialParams={{ cedula, clave }} />
+      <Tab.Screen name="Noticias" component={News} initialParams={{ cedula, clave }} />
+      <Tab.Screen name="Clima" component={Weather} initialParams={{ cedula, clave }} />
+      <Tab.Screen name="Horóscopo" component={Horoscope} initialParams={{ cedula, clave }} />
+      <Tab.Screen name="Perfil" component={ProfileScreen} initialParams={{ cedula, clave }} />
     </Tab.Navigator>
   );
-}
+};
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -123,7 +130,7 @@ export default function App() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) {
-    return null; // O muestra una pantalla de carga
+    return null; 
   }
 
   return (
@@ -134,12 +141,20 @@ export default function App() {
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="RestorePassword" component={RestorePassword} />
-          <Stack.Screen name="MainApp" component={MainTabs} />
-          <Stack.Screen name="EditProfile" component={EditProfile} options={{
-            headerLeft:()=>null,
+          <Stack.Screen 
+            name="MainApp" 
+            component={MainTabs} 
+            initialParams={{ cedula: '', clave: '' }} 
+          />
+          <Stack.Screen 
+            name="EditProfile" 
+            component={EditProfile} 
+            options={{
+              headerLeft: () => null,
               headerTitle: () => <CustomHeader title="MINERD" />,
               ...TransitionPresets.BottomSheetAndroid,
-            }}/>
+            }} 
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </View>
