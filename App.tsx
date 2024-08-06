@@ -15,8 +15,9 @@ import Horoscope from './components/Horoscope/Horoscope';
 import News from './components/News';
 import Visits from './components/Visits';
 import Weather from './components/Weather';
-import Profile from './components/Profile';
 import { hasUsers } from './components/MinerdDb';
+import ProfileScreen from './components/Profile/ProfileScreen';
+import EditProfile from './components/Profile/editProfile';
 
 export type RootStackParamList = {
   OnboardingPage: undefined;
@@ -35,6 +36,7 @@ export type RootStackParamList = {
     signo: string;
   };
   MainApp: undefined;
+  EditProfile: undefined; // Añadido aquí
 };
 
 export type MainTabsParamList = {
@@ -108,7 +110,7 @@ function MainTabs() {
       <Tab.Screen name="Noticias" component={News} />
       <Tab.Screen name="Clima" component={Weather} />
       <Tab.Screen name="Horóscopo" component={Horoscope} />
-      <Tab.Screen name="Perfil" component={Profile} />
+      <Tab.Screen name="Perfil" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }
@@ -173,7 +175,10 @@ export default function App() {
               <Stack.Screen name="OnboardingFinish" component={OnboardingFinish} />
             </>
           ) : (
-            <Stack.Screen name="MainApp" component={MainTabs} />
+            <>
+              <Stack.Screen name="MainApp" component={MainTabs} />
+              <Stack.Screen name="EditProfile" component={EditProfile} /> 
+            </>
           )}
         </Stack.Navigator>
       </NavigationContainer>
