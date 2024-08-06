@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../UserService';
+import { getPhotos } from '../data/db';
 
 export default function ProfileScreen({ navigation }: any) {
   const [cedula, setCedula] = useState('');
   const [clave, setClave] = useState('');
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [phrase, setPhrase] = useState<string | null>(null);
   const user = useUser(cedula, clave);
 
   useEffect(() => {
@@ -36,11 +39,25 @@ export default function ProfileScreen({ navigation }: any) {
     }
   }, [cedula, clave]);
 
+  useEffect(() => {
+    const loadPhotosAndPhrase = async () => {
+      try {
+        const photos = await getPhotos();
+        if (photos.length > 0) {
+          setPhotoUri(photos[0].photo);
+          setPhrase(photos[0].phrase);
+        }
+      } catch (error) {
+        console.error('Error cargando fotos y frases:', error);
+      }
+    };
+
+    loadPhotosAndPhrase();
+  }, []);
+
   const deleteUser = async () => {
-    
-      Alert.alert('Usuario eliminado', 'Los datos del usuario han sido eliminados.');
-      navigation.navigate('Login'); // Redirigir al usuario a la pantalla de inicio de sesión
-   
+    Alert.alert('Usuario eliminado', 'Los datos del usuario han sido eliminados.');
+    navigation.navigate('Login');
   };
 
   const confirmDeleteUser = () => {
@@ -70,11 +87,15 @@ export default function ProfileScreen({ navigation }: any) {
         </TouchableOpacity>
       </View>
       <View style={styles.profiledata}>
-        <Image source={require('../../assets/profileimage.png')} style={styles.profileImg} />
+        {photoUri ? (
+          <Image source={{ uri: photoUri }} style={styles.profileImg} />
+        ) : (
+          <Image source={require('../../assets/perfildefault.png')} style={styles.profileImg} />
+        )}
         <Text style={styles.profileName}>{user?.nombre || 'Nombre'}</Text>
         <Text style={styles.profileID}>{cedula}</Text>
         <View style={styles.card}>
-          <Text style={styles.TextCard}>“Que Leny no toque mis diseños”</Text>
+          <Text style={styles.TextCard}>{phrase || 'Frase no disponible'}</Text>
         </View>
         <TouchableOpacity style={styles.deleteButton} onPress={confirmDeleteUser}>
           <Text style={styles.deleteButtonText}>Eliminar data</Text>
