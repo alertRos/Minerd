@@ -3,7 +3,8 @@ import { View, Text, Image, TextInput, TouchableOpacity, ScrollView } from 'reac
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts, Alata_400Regular } from '@expo-google-fonts/alata';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons'; // Importa Ionicons para el ícono de cerrar
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import StyleViews from '../Styles/Visits';
 
 SplashScreen.preventAutoHideAsync();
@@ -19,6 +20,8 @@ const VisitsCB = () => {
   const [directorId, setDirectorId] = useState('');
   const [directorName, setDirectorName] = useState('');
   const [comment, setComment] = useState('');
+  
+  const navigation = useNavigation();
 
   const [fontsLoaded] = useFonts({
     Alata_400Regular,
@@ -48,7 +51,7 @@ const VisitsCB = () => {
 <View style={StyleViews.Testt}>
 <View style={StyleViews.dateCloseRow}>
     <Text style={[StyleViews.date, { fontFamily: 'Alata_400Regular' }]}>14 de Agosto 2024 03:42 PM</Text>
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => navigation.goBack()}>
       <Ionicons name="close" size={35} color="#17202A" />
     </TouchableOpacity>
   </View>
@@ -141,4 +144,3 @@ const VisitsCB = () => {
 }
 
 export default VisitsCB;
-
