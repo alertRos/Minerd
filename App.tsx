@@ -17,7 +17,6 @@ import ProfileScreen from './components/Profile/ProfileScreen';
 import CustomHeader from './components/CustomHeader';
 import { TransitionPresets } from '@react-navigation/stack';
 import * as SplashScreen from 'expo-splash-screen';
-import EditProfile from './components/Profile/editProfile';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -33,7 +32,6 @@ export type RootStackParamList = {
   MainApp: { cedula: string, clave: string }; // Ajustado aquí
   Register: undefined;
   RestorePassword: undefined;
-  EditProfile: undefined;
 };
 
 type MainTabsProps = {
@@ -146,15 +144,7 @@ export default function App() {
             component={MainTabs} 
             initialParams={{ cedula: '', clave: '' }} 
           />
-          <Stack.Screen 
-            name="EditProfile" 
-            component={EditProfile} 
-            options={{
-              headerLeft: () => null,
-              headerTitle: () => <CustomHeader title="MINERD" />,
-              ...TransitionPresets.BottomSheetAndroid,
-            }} 
-          />
+          
         </Stack.Navigator>
       </NavigationContainer>
     </View>

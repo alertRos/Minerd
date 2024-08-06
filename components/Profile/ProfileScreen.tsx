@@ -18,7 +18,6 @@ export default function ProfileScreen({ navigation }: any) {
         const storedClave = await AsyncStorage.getItem('clave');
         console.log('Stored Cedula:', storedCedula);
         console.log('Stored Clave:', storedClave);
-
         if (storedCedula !== null && storedClave !== null) {
           setCedula(storedCedula);
           setClave(storedClave);
@@ -75,16 +74,6 @@ export default function ProfileScreen({ navigation }: any) {
     <View style={styles.container}>
       <View style={styles.titlegroup}>
         <Text style={styles.perfilText}>Perfil</Text>
-        <TouchableOpacity 
-          activeOpacity={0.5} 
-          style={styles.editButton} 
-          onPress={() => navigation.navigate('EditProfile')}
-        >
-          <Image
-            source={require('../../assets/edit.png')}
-            style={styles.editImage}
-          />
-        </TouchableOpacity>
       </View>
       <View style={styles.profiledata}>
         {photoUri ? (
@@ -93,6 +82,7 @@ export default function ProfileScreen({ navigation }: any) {
           <Image source={require('../../assets/perfildefault.png')} style={styles.profileImg} />
         )}
         <Text style={styles.profileName}>{user?.nombre || 'Nombre'}</Text>
+        <Text style={styles.profileName}>{user?.apellido || 'Apellido'}</Text>
         <Text style={styles.profileID}>{cedula}</Text>
         <View style={styles.card}>
           <Text style={styles.TextCard}>{phrase || 'Frase no disponible'}</Text>
@@ -122,13 +112,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   perfilText: {
-    fontSize: 24,
-    fontWeight: '400',
+    fontSize: 34,
+    fontWeight: 'bold',
     lineHeight: 33.12,
     color: '#17202A',
     fontFamily: 'Alata-Regular',
     flex: 1,
     marginLeft: 20,
+    textAlign:'center'
   },
   editButton: {
     justifyContent: 'center',

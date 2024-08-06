@@ -18,6 +18,22 @@ export const insertPhoto = (photoUri: string, phrase: string) => {
     );
   });
 };
+export const updatePhoto = (id: number, photoUri: string, phrase: string) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        'UPDATE UserPhotos SET photo = ?, phrase = ? WHERE id = ?;',
+        [photoUri, phrase, id],
+        (_, result) => {
+          console.log('Update result:', result);
+        },
+        (_tx, error) => {
+          console.error('Error updating data:', error);
+          return false;
+        }
+      );
+    });
+  };
+  
 
 export const getPhotos = (): Promise<{ id: number; photo: string; phrase: string }[]> => {
   return new Promise((resolve, reject) => {
