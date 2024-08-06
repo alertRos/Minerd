@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../UserService';
 
@@ -13,11 +13,13 @@ export default function ProfileScreen({ navigation }: any) {
       try {
         const storedCedula = await AsyncStorage.getItem('cedula');
         const storedClave = await AsyncStorage.getItem('clave');
+        console.log('Stored Cedula:', storedCedula);
+        console.log('Stored Clave:', storedClave);
+
         if (storedCedula !== null && storedClave !== null) {
           setCedula(storedCedula);
           setClave(storedClave);
         } else {
-          // Manejar el caso en el que no se encuentran las credenciales
           console.warn('Credenciales no encontradas en AsyncStorage');
         }
       } catch (error) {
@@ -27,6 +29,30 @@ export default function ProfileScreen({ navigation }: any) {
 
     loadCredentials();
   }, []);
+
+  useEffect(() => {
+    if (cedula && clave) {
+      console.log('Fetching user with cedula and clave:', cedula, clave);
+    }
+  }, [cedula, clave]);
+
+  const deleteUser = async () => {
+    
+      Alert.alert('Usuario eliminado', 'Los datos del usuario han sido eliminados.');
+      navigation.navigate('Login'); // Redirigir al usuario a la pantalla de inicio de sesión
+   
+  };
+
+  const confirmDeleteUser = () => {
+    Alert.alert(
+      'Confirmar eliminación',
+      '¿Estás seguro de que deseas eliminar todos los datos del usuario?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Eliminar', onPress: deleteUser },
+      ]
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -50,7 +76,7 @@ export default function ProfileScreen({ navigation }: any) {
         <View style={styles.card}>
           <Text style={styles.TextCard}>“Que Leny no toque mis diseños”</Text>
         </View>
-        <TouchableOpacity style={styles.deleteButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.deleteButton} onPress={confirmDeleteUser}>
           <Text style={styles.deleteButtonText}>Eliminar data</Text>
         </TouchableOpacity>
       </View>
@@ -58,13 +84,11 @@ export default function ProfileScreen({ navigation }: any) {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: 20,
-
   },
   titlegroup: {
     flexDirection: 'row',
@@ -83,7 +107,7 @@ const styles = StyleSheet.create({
     color: '#17202A',
     fontFamily: 'Alata-Regular',
     flex: 1,
-    marginLeft:20
+    marginLeft: 20,
   },
   editButton: {
     justifyContent: 'center',
@@ -120,8 +144,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     shadowColor: '#1E1E1E',
     shadowOffset: {
-        width: 0,
-        height: 2,
+      width: 0,
+      height: 2,
     },
     shadowOpacity: 0.8,
     shadowRadius: 6,

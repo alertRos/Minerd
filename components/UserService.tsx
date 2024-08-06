@@ -14,22 +14,24 @@ export const useUser = (cedula: string, clave: string) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch(`https://adamix.net/minerd/def/iniciar_sesion.php?cedula=${cedula}&clave=${clave}`);
-        const result = await response.json();
+    if (cedula && clave) {
+      const fetchUserData = async () => {
+        try {
+          const response = await fetch(`https://adamix.net/minerd/def/iniciar_sesion.php?cedula=${cedula}&clave=${clave}`);
+          const result = await response.json();
 
-        if (result.exito) {
-          setUser(result.datos);
-        } else {
-          throw new Error(result.mensaje);
+          if (result.exito) {
+            setUser(result.datos);
+          } else {
+            throw new Error(result.mensaje);
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
         }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
+      };
 
-    fetchUserData();
+      fetchUserData();
+    }
   }, [cedula, clave]);
 
   return user;
