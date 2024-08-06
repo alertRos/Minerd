@@ -9,13 +9,13 @@ import * as SplashScreen from 'expo-splash-screen';
 import OnboardingPage from './components/Onboarding/Onboarding';
 import Login from './components/Onboarding/Login';
 import OnboardingSigno from './components/Onboarding/Onboarding3';
-import OnboardingFinish from './components/Onboarding/Onboarding4';
 import Horoscope from './components/Horoscope';
 import News from './components/News';
 import Visits from './components/Visits';
 import Weather from './components/Weather';
 import Profile from './components/Profile';
 import Register from './components/Onboarding/Register';
+import { RestorePassword } from './components/Onboarding/RestorePassword';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -128,7 +128,7 @@ export default function App() {
           <Stack.Screen name="OnboardingPage" component={OnboardingPage} />
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="OnboardingFinish" component={OnboardingFinish} />
+          <Stack.Screen name="RestorePassword" component={RestorePassword} />
           <Stack.Screen name="MainApp" component={MainTabs} />
         </Stack.Navigator>
       </NavigationContainer>

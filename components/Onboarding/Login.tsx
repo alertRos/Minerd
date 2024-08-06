@@ -54,7 +54,7 @@ export default function Login({ navigation }: any) {
         <Text style={styles.registerButtonText}>Registrarse</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('RestorePassword')}>
-        <Text style={styles.registerButtonText}>¿Haz olvidado tu contraseña? Recupérala</Text>
+        <Text style={{fontWeight:'600', color: '#0071BD', fontSize: 18, marginTop: 30}}>¿Haz olvidado tu contraseña? Recupérala</Text>
       </TouchableOpacity>
     </View>
   );
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    width: '100%',
+    width: 320,
     alignItems: 'center',
   },
   buttonText: {
@@ -115,12 +115,11 @@ const styles = StyleSheet.create({
     fontFamily: 'alata-regular',
   },
   registerButton: {
-    marginVertical: 10,
     backgroundColor: '#0071BD',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    width: '100%',
+    width: 320,
     alignItems: 'center',
   },
   registerButtonText: {
