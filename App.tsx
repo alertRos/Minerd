@@ -174,6 +174,7 @@ export default function App() {
               <Stack.Screen name="OnboardingSigno" component={OnboardingSigno} />
               <Stack.Screen name="OnboardingFinish" component={OnboardingFinish} />
               <Stack.Screen name="MainApp" component={MainTabs} />
+              <Stack.Screen name="EditProfile" component={EditProfile} /> 
             </>
           ) : (
             <>
