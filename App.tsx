@@ -9,13 +9,13 @@ import * as SplashScreen from 'expo-splash-screen';
 import OnboardingPage from './components/Onboarding/Onboarding';
 import Login from './components/Onboarding/Login';
 import OnboardingSigno from './components/Onboarding/Onboarding3';
-import Horoscope from './components/Horoscope';
 import News from './components/News';
 import Visits from './components/Visits';
 import Weather from './components/Weather';
 import Profile from './components/Profile';
 import Register from './components/Onboarding/Register';
 import { RestorePassword } from './components/Onboarding/RestorePassword';
+import Horoscope from './components/Horoscope/Horoscope';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
