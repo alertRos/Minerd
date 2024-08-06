@@ -4,7 +4,7 @@ import Swiper from 'react-native-swiper';
 import DatePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 
-export default function LoginPage({ navigation }: any) {
+export default function Register({ navigation }: any) {
   const [cedula, setCedula] = useState('');
   const [clave, setClave] = useState('');
   const [nombre, setNombre] = useState('');
@@ -28,8 +28,7 @@ export default function LoginPage({ navigation }: any) {
       const result = await response.json();
 
       if (result.exito) {
-        setRegistered(true); // Cambia el estado a registrado
-        Alert.alert('Registro exitoso', '¡Te has registrado correctamente!', [{ text: 'OK', onPress: () => navigation.navigate('LoginPage') }]);
+        setRegistered(true); 
       } else {
         Alert.alert('Error', result.mensaje);
       }

@@ -4,18 +4,23 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-
 import OnboardingPage from './components/Onboarding/Onboarding';
 import Login from './components/Onboarding/Login';
 import OnboardingSigno from './components/Onboarding/Onboarding3';
-import Horoscope from './components/Horoscope';
 import News from './components/News';
 import Visits from './components/Visits';
 import Weather from './components/Weather';
-import Profile from './components/Profile';
 import Register from './components/Onboarding/Register';
 import { RestorePassword } from './components/Onboarding/RestorePassword';
+import Horoscope from './components/Horoscope/Horoscope';
+import EditProfile from './components/Profile/editProfile';
+import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as Font from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import ProfileScreen from './components/Profile/ProfileScreen';
+import CustomHeader from './components/CustomHeader';
+import {TransitionPresets } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -91,7 +96,7 @@ function MainTabs() {
       <Tab.Screen name="Noticias" component={News} />
       <Tab.Screen name="Clima" component={Weather} />
       <Tab.Screen name="Horóscopo" component={Horoscope} />
-      <Tab.Screen name="Perfil" component={Profile} />
+      <Tab.Screen name="Perfil" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }
@@ -130,6 +135,11 @@ export default function App() {
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="RestorePassword" component={RestorePassword} />
           <Stack.Screen name="MainApp" component={MainTabs} />
+          <Stack.Screen name="EditProfile" component={EditProfile} options={{
+            headerLeft:()=>null,
+              headerTitle: () => <CustomHeader title="MINERD" />,
+              ...TransitionPresets.BottomSheetAndroid,
+            }}/>
         </Stack.Navigator>
       </NavigationContainer>
     </View>
