@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
 
+
 type OnboardingPageNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingPage'>;
 
 type Props = {

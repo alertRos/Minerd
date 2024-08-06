@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
 import { createUser, initializeDatabase } from '../MinerdDb';
 
-type OnboardingPageNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingPage'>;
+type OnboardingFinishNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingFinish'>;
 
 type Props = {
   route: {
@@ -17,7 +17,7 @@ type Props = {
       signo: string;
     };
   };
-  navigation: OnboardingPageNavigationProp;
+  navigation: OnboardingFinishNavigationProp;
 };
 
 const OnboardingFinish = ({ route, navigation }: Props) => {
