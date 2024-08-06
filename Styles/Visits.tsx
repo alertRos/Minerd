@@ -109,9 +109,8 @@ const StyleViews = StyleSheet.create({
   saveButtonText: {
     color: '#fff',
     textAlign: 'center',
-    fontSize: 18,
-    fontWeight: 'bold',
     fontSize: 24,
+    fontWeight: 'bold'
   },
   Testt: {
     borderTopRightRadius: 16,
