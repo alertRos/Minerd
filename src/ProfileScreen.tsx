@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../App';
 
-type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditProfile'>;
 
 type Props = {
   navigation: ProfileScreenNavigationProp;
