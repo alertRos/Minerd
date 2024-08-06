@@ -3,6 +3,7 @@ import { Image, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+<<<<<<< HEAD
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -12,6 +13,9 @@ import OnboardingSigno from './components/Onboarding/Onboarding3';
 import OnboardingFinish from './components/Onboarding/Onboarding4';
 
 import Horoscope from './components/Horoscope';
+=======
+import Horoscope from './components/Horoscope/Horoscope';
+>>>>>>> origin/horoscope
 import News from './components/News';
 import Visits from './components/Visits';
 import Weather from './components/Weather';
