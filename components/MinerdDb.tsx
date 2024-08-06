@@ -12,13 +12,13 @@ export type Visit = {
   cedula_director: string;
   nombre_director: string;
   comentario: string;
-  foto: string;
-  audio: string;
+  foto: string | null; // Cambiado a string | null para manejar valores nulos
+  audio: string | null; // Cambiado a string | null para manejar valores nulos
 };
 
 export type User = {
   id: number;
-  foto: string;
+  foto: string | null; // Cambiado a string | null para manejar valores nulos
   nombre: string;
   apellido: string;
   matricula: string;
@@ -27,7 +27,7 @@ export type User = {
 };
 
 const db = SQLite.openDatabase('minerd');
-//Recuerden inicializar en cada vista donde usen la base de datos
+
 export const initializeDatabase = () => {
   db.transaction(tx => {
     tx.executeSql(
@@ -39,8 +39,9 @@ export const initializeDatabase = () => {
   });
 };
 
+
 //******************************** Usuarios  
-export const createUser = (foto: string, nombre: string, apellido: string, matricula: string, frase: string, signo: string) => {
+export const createUser = (foto: string | null, nombre: string, apellido: string, matricula: string, frase: string, signo: string) => {
   db.transaction(tx => {
     tx.executeSql(
       'INSERT INTO Usuario (foto, nombre, apellido, matricula, frase, signo) VALUES (?, ?, ?, ?, ?, ?);',
@@ -50,13 +51,43 @@ export const createUser = (foto: string, nombre: string, apellido: string, matri
   });
 };
 
-export const updateUser = (id: number, foto: string, nombre: string, apellido: string, matricula: string, frase: string, signo: string) => {
-  db.transaction(tx => {
-    tx.executeSql(
-      'UPDATE Usuario SET foto = ?, nombre = ?, apellido = ?, matricula = ?, frase = ?, signo = ? WHERE id = ?;',
-      [foto, nombre, apellido, matricula, frase, signo, id],
-      () => console.log('Usuario actualizado exitosamente')
-    );
+export const getCurrentUserId = (): Promise<number | null> => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        'SELECT id FROM Usuario WHERE /* condición para obtener el usuario actual */;',
+        [], 
+        (_, { rows: { _array } }) => {
+          if (_array.length > 0) {
+            resolve(_array[0].id);
+          } else {
+            resolve(null);
+          }
+        },
+        (_, error) => {
+          reject(error);
+          return false;
+        }
+      );
+    });
+  });
+};
+
+
+
+export const updateUser = (id: number, nombre: string, apellido: string, matricula: string, frase: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    db.transaction(tx => {
+      tx.executeSql(
+        'UPDATE Usuario SET nombre = ?, apellido = ?, matricula = ?, frase = ? WHERE id = ?;',
+        [nombre, apellido, matricula, frase, id],
+        () => resolve(),
+        (_, error) => {
+          reject(error);
+          return false;
+        }
+      );
+    });
   });
 };
 
@@ -74,14 +105,17 @@ export const hasUsers = (): Promise<boolean> => {
   });
 };
 
-export const getUser = (id: number): Promise<User | null> => {
+// Función para convertir Blob a Base64
+
+export const getUser = (userId: number): Promise<User | undefined> => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        'SELECT * FROM Usuario WHERE id = ?;',
-        [id],
+        'SELECT * FROM Usuario WHERE id = ?',
+        [userId],
         (_, { rows: { _array } }) => {
-          resolve(_array.length > 0 ? _array[0] as User : null);
+          const user = _array.length > 0 ? _array[0] as User : undefined;
+          resolve(user);
         },
         (_, error) => {
           reject(error);
@@ -92,9 +126,10 @@ export const getUser = (id: number): Promise<User | null> => {
   });
 };
 
+
 // ******************* Visitas
 
-export const createVisit = (fecha: string, titulo: string, motivo: string, codigo_institucion: string, nombre_institucion: string, latitud: number, longitud: number, cedula_director: string, nombre_director: string, comentario: string, foto: string, audio: string) => {
+export const createVisit = (fecha: string, titulo: string, motivo: string, codigo_institucion: string, nombre_institucion: string, latitud: number, longitud: number, cedula_director: string, nombre_director: string, comentario: string, foto: string | null, audio: string | null) => {
   db.transaction(tx => {
     tx.executeSql(
       'INSERT INTO Visita (fecha, titulo, motivo, codigo_institucion, nombre_institucion, latitud, longitud, cedula_director, nombre_director, comentario, foto, audio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
@@ -104,7 +139,7 @@ export const createVisit = (fecha: string, titulo: string, motivo: string, codig
   });
 };
 
-export const updateVisit = (id: number, fecha: string, titulo: string, motivo: string, codigo_institucion: string, nombre_institucion: string, latitud: number, longitud: number, cedula_director: string, nombre_director: string, comentario: string, foto: string, audio: string) => {
+export const updateVisit = (id: number, fecha: string, titulo: string, motivo: string, codigo_institucion: string, nombre_institucion: string, latitud: number, longitud: number, cedula_director: string, nombre_director: string, comentario: string, foto: string | null, audio: string | null) => {
   db.transaction(tx => {
     tx.executeSql(
       'UPDATE Visita SET fecha = ?, titulo = ?, motivo = ?, codigo_institucion = ?, nombre_institucion = ?, latitud = ?, longitud = ?, cedula_director = ?, nombre_director = ?, comentario = ?, foto = ?, audio = ? WHERE id = ?;',
@@ -155,8 +190,7 @@ export const getVisits = (): Promise<Visit[]> => {
   });
 };
 
-
-//Borrals todo
+//Borrars todo
 export const deleteAllData = () => {
   db.transaction(tx => {
     tx.executeSql('DELETE FROM Usuario;', [], () => console.log('Todos los usuarios eliminados'));

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
+import { getUser, User, deleteAllData } from '../MinerdDb';
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditProfile'>;
 
@@ -9,7 +10,42 @@ type Props = {
   navigation: ProfileScreenNavigationProp;
 };
 
-export default function ProfileScreen({ navigation }: Props) {
+const ProfileScreen = ({ navigation }: Props) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        if (userId !== undefined) {
+          const fetchedUser = await getUser(userId);
+          
+          console.log('Fetched user:', fetchedUser); // Verifica los datos recibidos
+          setUser(fetchedUser);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
+
+  useEffect(() => {
+    setUserId();
+  }, []);
+
+  if (loading) {
+    return <Text>Cargando...</Text>;
+  }
+
+  if (!user) {
+    return <Text>No se encontró el usuario.</Text>;
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.titlegroup}>
@@ -26,27 +62,30 @@ export default function ProfileScreen({ navigation }: Props) {
         </TouchableOpacity>
       </View>
       <View style={styles.profiledata}>
-        <Image source={require('../../assets/profileimage.png')} style={styles.profileImg} />
-        <Text style={styles.profileName}>Mojo Jojo</Text>
-        <Text style={styles.profileID}>2025-1998</Text>
+        <Image 
+          source={{ uri: user.foto || 'data:image/png;base64,' }} 
+          style={styles.profileImg} 
+        />
+        <Text style={styles.profileName}>{user.nombre || 'Nombre del Usuario'}</Text>
+        <Text style={styles.profileName}>{user.id || 'Nombre del Usuario'}</Text>
+        <Text style={styles.profileName}>{user.apellido || 'Apellido del Usuario'}</Text>
+        <Text style={styles.profileID}>{user.matricula || 'ID del Usuario'}</Text>
         <View style={styles.card}>
-          <Text style={styles.TextCard}>“Que Leny no toque mis diseños”</Text>
+          <Text style={styles.TextCard}>{user.frase || 'Frase del Usuario'}</Text>
         </View>
-        <TouchableOpacity style={styles.deleteButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.deleteButton} onPress={() => deleteAllData()}>
           <Text style={styles.deleteButtonText}>Eliminar data</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
-}
-
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: 20,
-
   },
   titlegroup: {
     flexDirection: 'row',
@@ -65,7 +104,7 @@ const styles = StyleSheet.create({
     color: '#17202A',
     fontFamily: 'Alata-Regular',
     flex: 1,
-    marginLeft:20
+    marginLeft: 20,
   },
   editButton: {
     justifyContent: 'center',
@@ -102,8 +141,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     shadowColor: '#1E1E1E',
     shadowOffset: {
-        width: 0,
-        height: 2,
+      width: 0,
+      height: 2,
     },
     shadowOpacity: 0.8,
     shadowRadius: 6,
@@ -139,3 +178,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default ProfileScreen;

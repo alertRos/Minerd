@@ -5,12 +5,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-
 import OnboardingPage from './components/Onboarding/Onboarding';
 import OnboardingCreatePage from './components/Onboarding/Onboarding2';
 import OnboardingSigno from './components/Onboarding/Onboarding3';
 import OnboardingFinish from './components/Onboarding/Onboarding4';
-
 import Horoscope from './components/Horoscope/Horoscope';
 import News from './components/News';
 import Visits from './components/Visits';
@@ -36,7 +34,7 @@ export type RootStackParamList = {
     signo: string;
   };
   MainApp: undefined;
-  EditProfile: undefined; // Añadido aquí
+  EditProfile: undefined;
 };
 
 export type MainTabsParamList = {
@@ -115,7 +113,6 @@ function MainTabs() {
   );
 }
 
-// Componente principal de la aplicación
 export default function App() {
   const [fontsLoaded] = useFonts({
     'alata-regular': require('./assets/fonts/Alata-Regular.ttf'),
@@ -125,6 +122,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    SplashScreen.preventAutoHideAsync(); // Evitar que el splash screen se oculte automáticamente
+
     const checkUser = async () => {
       try {
         const userExists = await hasUsers();
@@ -159,8 +158,8 @@ export default function App() {
     }
   }, [fontsLoaded]);
 
-  if (loading) {
-    return <Text style={{ textAlign: 'center', marginTop: 20 }}>Cargando...</Text>;
+  if (loading || !fontsLoaded) {
+    return null; // Puedes reemplazar esto con un splash screen personalizado si lo deseas
   }
 
   return (
@@ -177,7 +176,7 @@ export default function App() {
           ) : (
             <>
               <Stack.Screen name="MainApp" component={MainTabs} />
-              <Stack.Screen name="EditProfile" component={EditProfile} /> 
+              <Stack.Screen name="EditProfile" component={EditProfile} />
             </>
           )}
         </Stack.Navigator>

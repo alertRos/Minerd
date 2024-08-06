@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
 import { LinearGradient } from 'expo-linear-gradient';
+import { createUser, updateUser, getUser } from '../MinerdDb'; // Import your database functions
 
 type OnboardingPageNavigationProp = StackNavigationProp<RootStackParamList, 'OnboardingSigno'>;
 
@@ -15,63 +17,51 @@ export default function OnboardingCreatePage({ navigation }: Props) {
   const [apellido, setApellido] = useState('');
   const [matricula, setMatricula] = useState('');
   const [frase, setFrase] = useState('');
+  const [foto, setFoto] = useState<string | null>(null);
 
-  const handleContinue = () => {
-    navigation.navigate('OnboardingSigno', {
-      nombre,
-      apellido,
-      matricula,
-      frase,
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setFoto(result.assets[0].uri);
+    }
   };
+
+  const handleContinue = async () => {
+    try {
+      await createUser(foto, nombre, apellido, matricula, frase, ''); // Assuming signo is handled in the next screen
+      navigation.navigate('OnboardingSigno', {
+        nombre,
+        apellido,
+        matricula,
+        frase,
+      });
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo actualizar el perfil.');
+    }
+  };
+  
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#FDFEFE', '#0071BD']}
-        style={styles.background}
-      />
-      <Image 
-        source={require('../../assets/icons/minerd.png')} 
-        style={styles.image} 
-      />
+      <LinearGradient colors={['#FDFEFE', '#0071BD']} style={styles.background} />
+      <Image source={require('../../assets/icons/minerd.png')} style={styles.image} />
       <Text style={styles.headerText}>Actualiza tu perfil</Text>
       <View style={styles.profiledata}>
         <View style={styles.profileImgContainer}>
-          <Image 
-            source={require('../../assets/perfildefault.png')} 
-            style={styles.profileImg} 
-          />
-          <TouchableOpacity 
-            activeOpacity={0.7}
-            style={styles.cameraButton} 
-            onPress={() => {}}
-          >
-            <Image
-              source={require('../../assets/camera.png')}
-              style={styles.cameraImage}
-            />
+          <Image source={foto ? { uri: foto } : require('../../assets/perfildefault.png')} style={styles.profileImg} />
+          <TouchableOpacity activeOpacity={0.7} style={styles.cameraButton} onPress={pickImage}>
+            <Image source={require('../../assets/camera.png')} style={styles.cameraImage} />
           </TouchableOpacity>
         </View>
-        <TextInput
-          style={styles.input}
-          placeholder="Nombre"
-          value={nombre}
-          onChangeText={setNombre}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Apellido"
-          value={apellido}
-          onChangeText={setApellido}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Matricula"
-          keyboardType='numeric'
-          value={matricula}
-          onChangeText={setMatricula}
-        />
+        <TextInput style={styles.input} placeholder="Nombre" value={nombre} onChangeText={setNombre} />
+        <TextInput style={styles.input} placeholder="Apellido" value={apellido} onChangeText={setApellido} />
+        <TextInput style={styles.input} placeholder="Matricula" keyboardType='numeric' value={matricula} onChangeText={setMatricula} />
         <TextInput
           style={styles.textArea}
           placeholder="Reflexión o frase..."
@@ -82,10 +72,7 @@ export default function OnboardingCreatePage({ navigation }: Props) {
         />
         <TouchableOpacity style={styles.continuarButton} onPress={handleContinue}>
           <Text style={styles.continuarButtonText}>Continuar</Text>
-          <Image 
-            source={require('../../assets/rowWhite.png')} 
-            style={styles.icono}
-          />
+          <Image source={require('../../assets/rowWhite.png')} style={styles.icono} />
         </TouchableOpacity>
       </View>
     </View>

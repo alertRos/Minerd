@@ -1,8 +1,65 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { getUser, updateUser, User } from '../MinerdDb'; // Asegúrate de que updateUser esté implementado en MinerdDb
+import { useNavigation, useRoute } from '@react-navigation/native';
+
+type EditProfileRouteParams = {
+  userId: number;
+};
 
 export default function EditProfile() {
+  const [user, setUser] = useState<User | null>(null);
+  const [name, setName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [matricula, setMatricula] = useState('');
+  const [frase, setFrase] = useState('');
+  const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
+  const route = useRoute();
+  
+  const { userId } = route.params as EditProfileRouteParams;
+
+  useEffect(() => {
+    if (userId === null || userId === undefined) return;
+
+    const fetchUser = async () => {
+      try {
+        const fetchedUser = await getUser(userId);
+        if (fetchedUser) {
+          setUser(fetchedUser);
+          setName(fetchedUser.nombre);
+          setLastName(fetchedUser.apellido);
+          setMatricula(fetchedUser.matricula);
+          setFrase(fetchedUser.frase);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
+
+  const handleSave = async () => {
+    if (user && userId !== null) {
+      try {
+        await updateUser(userId, name, lastName, matricula, frase);
+        Alert.alert('Éxito', 'Perfil actualizado correctamente');
+        navigation.goBack(); // Regresa a la pantalla anterior
+      } catch (error) {
+        console.error('Error updating user data:', error);
+        Alert.alert('Error', 'No se pudo actualizar el perfil');
+      }
+    }
+  };
+
+  if (loading) {
+    return <Text>Cargando...</Text>;
+  }
+
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -27,26 +84,37 @@ export default function EditProfile() {
         </View>
         <TextInput 
           style={styles.input} 
-          placeholder="User Name"
+          value={name}
+          onChangeText={setName}
+          placeholder="Nombre"
         />
         <TextInput 
           style={styles.input}
-          placeholder="User LastName"
+          value={lastName}
+          onChangeText={setLastName}
+          placeholder="Apellido"
         />
         <TextInput 
           style={styles.input}
-          placeholder="Matricula"
+          value={matricula}
+          onChangeText={setMatricula}
+          placeholder="Matrícula"
           keyboardType='numeric'
         />
         <View style={styles.card}>
-          <Text style={styles.TextCard}>“Que Leny no toque mis diseños”</Text>
+          <TextInput 
+            style={styles.TextCard}
+            value={frase}
+            onChangeText={setFrase}
+            placeholder="Frase"
+            multiline
+            textAlignVertical="top"
+          />
         </View>
-        <TouchableOpacity style={styles.deleteButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.deleteButton} onPress={handleSave}>
           <Text style={styles.deleteButtonText}>Guardar</Text>
         </TouchableOpacity>
-        
-        </View>
-      
+      </View>
     </View>
   );
 }
