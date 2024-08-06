@@ -12,7 +12,7 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { Image, Text } from 'react-native';
-import VisitaAle from './components/VisitaAle';
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -100,8 +100,8 @@ export default function App() {
           {() => (
             <Stack.Navigator>
               <Stack.Screen name="Visits" component={Visits} options={{ headerShown: false }}/>
-              <Stack.Screen name="AddVisit" component={AddVisit} />
-              <Stack.Screen name="VisitDetails" component={VisitDetails} />
+              <Stack.Screen name="AddVisit" component={AddVisit} options={{ headerShown: false }}/>
+              <Stack.Screen name="VisitDetails" component={VisitDetails} options={{ headerShown: false }} />
             </Stack.Navigator>
           )}
         </Tab.Screen>

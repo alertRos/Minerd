@@ -3,9 +3,7 @@ import { StyleSheet } from 'react-native';
 const StyleViews = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: 10,
-
-    
+    padding: 10,    
   },
   logo: {
     width: 200,
@@ -18,6 +16,7 @@ const StyleViews = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     alignItems: 'stretch',
+    
   },
   header: {
     fontSize: 35,
