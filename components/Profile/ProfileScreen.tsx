@@ -3,13 +3,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
 
-type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditProfile'>;
-
-type Props = {
-  navigation: ProfileScreenNavigationProp;
-};
-
-export default function ProfileScreen({ navigation }: Props) {
+export default function ProfileScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
       <View style={styles.titlegroup}>
@@ -39,7 +33,6 @@ export default function ProfileScreen({ navigation }: Props) {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
