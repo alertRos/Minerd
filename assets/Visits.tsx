@@ -81,8 +81,14 @@ const StyleViews = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
+  },
+  imageSection: {
+    justifyContent: 'center',
+    alignItems:'center',
+    marginTop: 20,
     marginBottom: 80,
-    
+    width:'100%',
+    height:250
   },
   fileButton: {
     flex: 1,

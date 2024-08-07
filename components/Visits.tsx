@@ -7,7 +7,9 @@ import MapView, { Marker } from 'react-native-maps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useUser } from './UserService';
-import VisitDetails from './VisitsDetails'; // Asegúrate de que la importación esté correcta
+import VisitDetails from './VisitsDetails';
+import { Icon } from 'react-native-paper';
+
 
 type RootStackParamList = {
   Visits: undefined;
@@ -24,6 +26,8 @@ type Visit = {
   institution: string;
   code: string;
   type: string;
+  foto_evidencia: string;
+  motivo:string;
 };
 
 const MapPopOut = ({ visible, onClose }: { visible: boolean, onClose: () => void }) => {
@@ -118,6 +122,8 @@ const Visits = () => {
           institution: item.codigo_centro,
           code: item.cedula_director,
           type: item.motivo,
+          foto_evidencia: item.photo,
+          motivo:item.motivo
         }));
         setVisitsData(formattedData);
       } else {
@@ -132,6 +138,7 @@ const Visits = () => {
 
   const renderItem = ({ item }: { item: Visit }) => (
     <View style={styles.visitItem}>
+      
       <Text style={styles.date}>{item.date}</Text>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.institution}>{item.institution}</Text>
@@ -174,9 +181,8 @@ const Visits = () => {
         style={styles.addButton}
         onPress={() => navigation.navigate('AddVisit')}
       >
-        <Text style={styles.addButtonText}>+</Text>
+      <Icon source={'plus'} size={32} color='#ffff'></Icon>
       </TouchableOpacity>
-
       <MapPopOut visible={isMapVisible} onClose={() => setIsMapVisible(false)} />
       
       <Modal
@@ -289,14 +295,14 @@ const styles = StyleSheet.create({
     tintColor: '#fff',
   },
   addButton: {
-    backgroundColor: '#0071BD',
+    backgroundColor: '#DC3545',
     width: 60,
     height: 60,
-    borderRadius: 30,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-    bottom: 20,
+    bottom: 80,
     right: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

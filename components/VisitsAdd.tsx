@@ -41,7 +41,6 @@ const VisitsCB = () => {
     }
   }, [fontsLoaded]);
 
-  
   useEffect(() => {
     const loadCredentials = async () => {
       try {
@@ -61,8 +60,19 @@ const VisitsCB = () => {
     loadCredentials();
   }, []);
 
+  const requestPermissions = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permisos insuficientes', 'Necesitamos acceso a tu galería para seleccionar una imagen.');
+      return false;
+    }
+    return true;
+  };
 
   const pickImage = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) return;
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -70,7 +80,7 @@ const VisitsCB = () => {
       quality: 1,
     });
 
-    if (!result.canceled) {
+    if (!result.canceled && result.assets && result.assets.length > 0) {
       setImageUri(result.assets[0].uri);
     }
   };
@@ -80,7 +90,7 @@ const VisitsCB = () => {
       type: 'audio/*',
     });
 
-    if (!result.canceled) {
+    if (!result.canceled && result.assets && result.assets.length > 0) {
       setAudioUri(result.assets[0].uri);
     }
   };
@@ -187,19 +197,27 @@ const VisitsCB = () => {
           />
           <View style={StyleViews.fileSection}>
             <TouchableOpacity style={StyleViews.fileButton} onPress={pickImage}>
-              <Image source={require('../assets/icons/image.png')} />
+                <Image source={require('../assets/icons/image.png')} />
             </TouchableOpacity>
             <TouchableOpacity style={StyleViews.fileButton} onPress={pickAudio}>
               <Image source={require('../assets/icons/headphones.png')} />
             </TouchableOpacity>
+
+          </View>
+          <View style={StyleViews.imageSection}>
+          {imageUri ? (
+                <Image source={{ uri: imageUri }} style={{ width: '100%', height: '100%' }} />
+              ) : (
+                <Image source={require('../assets/icons/image.png')} style={{width:450,height:350}}/>
+              )}
           </View>
           <TouchableOpacity style={StyleViews.saveButton} onPress={registerVisit}>
-            <Text style={StyleViews.saveButtonText}>Guardar</Text>
+            <Text style={StyleViews.saveButtonText}>Registrar</Text>
           </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
   );
-}
+};
 
 export default VisitsCB;
