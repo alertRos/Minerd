@@ -117,7 +117,7 @@ const VisitsCB = () => {
       console.log('API response:', result);
 
       if (result.exito) {
-        Alert.alert('Éxito', 'Visita registrada exitosamente');
+        Alert.alert('', 'Visita registrada');
       } else {
         Alert.alert('Error', result.mensaje);
       }
