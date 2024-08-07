@@ -1,8 +1,124 @@
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
+import * as SQLite from 'expo-sqlite/legacy';
+import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '../UserService';
+const db = SQLite.openDatabase('userProfile.db');
 
-export default function EditProfile() {
+const fetchUserProfile = (cedula: string, setPhotoUri: (uri: string | null) => void, setPhrase: (phrase: string | null) => void) => {
+  db.transaction(tx => {
+    tx.executeSql(
+      `SELECT photoUri, phrase FROM user_profile WHERE cedula = ?;`,
+      [cedula],
+      (_, { rows: { _array } }) => {
+        if (_array.length > 0) {
+          setPhotoUri(_array[0].photoUri);
+          setPhrase(_array[0].phrase);
+        }
+      }
+    );
+  });
+};
+
+const updateUserProfile = (cedula: string, photoUri: string | null, phrase: string | null) => {
+  db.transaction(tx => {
+    tx.executeSql(
+      `UPDATE user_profile SET photoUri = ?, phrase = ? WHERE cedula = ?;`,
+      [photoUri, phrase, cedula],
+      () => {
+        Alert.alert('Perfil actualizado', 'Tu perfil ha cambiado :)');
+      }
+    );
+  });
+};
+
+
+export default function EditProfile({ navigation }: any) {
+  const [cedula, setCedula] = useState('');
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [phrase, setPhrase] = useState<string | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [clave, setClave] = useState('');
+  const user = useUser(cedula, clave);
+
+  useEffect(() => {
+    const loadCredentials = async () => {
+      try {
+        const storedCedula = await AsyncStorage.getItem('cedula');
+        const storedClave = await AsyncStorage.getItem('clave');
+        console.log('Stored Cedula:', storedCedula);
+        console.log('Stored Clave:', storedClave);
+
+        if (storedCedula !== null && storedClave !== null) {
+          setCedula(storedCedula);
+          setClave(storedClave);
+        } else {
+          console.warn('Credenciales no encontradas en AsyncStorage');
+        }
+      } catch (error) {
+        console.error('Error recuperando credenciales:', error);
+      }
+    };
+
+    loadCredentials();
+  }, []);
+
+  useEffect(() => {
+    const loadCedula = async () => {
+      try {
+        const storedCedula = await AsyncStorage.getItem('cedula');
+        if (storedCedula) {
+          setCedula(storedCedula);
+          fetchUserProfile(storedCedula, setPhotoUri, setPhrase);
+        } else {
+          console.warn('Cedula no encontrada en AsyncStorage');
+        }
+      } catch (error) {
+        console.error('Error recuperando cedula:', error);
+      }
+    };
+
+    loadCedula();
+  }, []);
+
+  const handleSave = () => {
+    if (cedula) {
+      updateUserProfile(cedula, photoUri, phrase);
+    } else {
+      Alert.alert('Error', 'Cedula no disponible.');
+    }
+  };
+
+  const handlePickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+    });
+
+    if (!result.canceled && result.assets && result.assets[0].uri) {
+      setPhotoUri(result.assets[0].uri);
+    }
+  };
+
+  const handleChangePassword = () => {
+    Alert.alert(
+      'Cambio de clave',
+      '¿Estás seguro de que deseas cambiar tu clave?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Cambiar', onPress: () => updatePassword(newPassword) },
+      ]
+    );
+  };
+
+  const updatePassword = async (newClave: string) => {
+    await fetch(`https://adamix.net/minerd/def/cambiar_clave.php?token=${user?.token}&clave_anterior=${clave}&clave_nueva=${newClave}`);
+  };
+  
+
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -10,14 +126,14 @@ export default function EditProfile() {
         style={styles.background}
       />
       <Text style={styles.headerText}>Actualiza tu perfil</Text>
-      
+
       <View style={styles.profiledata}>
         <View style={styles.profileImgContainer}>
-          <Image source={require('../../assets/profileimage.png')} style={styles.profileImg} />
+          <Image source={{ uri: photoUri || '../../assets/profileimage.png' }} style={styles.profileImg} />
           <TouchableOpacity 
             activeOpacity={0.7}
             style={styles.cameraButton} 
-            onPress={() => {}}
+            onPress={handlePickImage}
           >
             <Image
               source={require('../../assets/camera.png')}
@@ -27,26 +143,30 @@ export default function EditProfile() {
         </View>
         <TextInput 
           style={styles.input} 
-          placeholder="User Name"
+          placeholder="Frase"
+          value={phrase || ''}
+          onChangeText={setPhrase}
         />
-        <TextInput 
-          style={styles.input}
-          placeholder="User LastName"
-        />
-        <TextInput 
-          style={styles.input}
-          placeholder="Matricula"
-          keyboardType='numeric'
-        />
-        <View style={styles.card}>
-          <Text style={styles.TextCard}>“Que Leny no toque mis diseños”</Text>
-        </View>
-        <TouchableOpacity style={styles.deleteButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.deleteButton} onPress={handleSave}>
           <Text style={styles.deleteButtonText}>Guardar</Text>
         </TouchableOpacity>
-        
-        </View>
-      
+        <TextInput 
+          style={styles.input} 
+          placeholder="Nueva clave"
+          value={newPassword}
+          onChangeText={setNewPassword}
+          secureTextEntry
+        />
+        <TouchableOpacity style={styles.changePasswordButton} onPress={handleChangePassword}>
+          <Text style={styles.changePasswordButtonText}>Cambiar clave</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>Volver atrás</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -59,7 +179,7 @@ const styles = StyleSheet.create({
   },
   cameraButton: {
     position: 'absolute',
-    backgroundColor:'#0071BD',
+    backgroundColor: '#0071BD',
     bottom: -4,
     left: 70,
     borderRadius: 50,
@@ -96,6 +216,20 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 20,
+  },
+  backButton: {
+    marginHorizontal: 20,
+    backgroundColor: '#ccc',
+    borderRadius: 10,
+    paddingVertical: 10,
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  backButtonText: {
+    color: '#0071BD',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   profileImgContainer: {
     position: 'relative',
@@ -150,6 +284,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   deleteButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  changePasswordButton: {
+    marginHorizontal: 20,
+    backgroundColor: '#ff4d4d',
+    borderRadius: 10,
+    paddingVertical: 10,
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  changePasswordButtonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',

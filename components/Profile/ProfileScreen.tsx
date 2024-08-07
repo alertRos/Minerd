@@ -1,8 +1,65 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SQLite from 'expo-sqlite/legacy';
 import { useUser } from '../UserService';
-import { getPhotos } from '../data/db';
+import { useFocusEffect } from '@react-navigation/native';
+
+const db = SQLite.openDatabase('userProfile.db');
+
+const initializeDatabase = () => {
+  db.transaction(tx => {
+    tx.executeSql(
+      `CREATE TABLE IF NOT EXISTS user_profile (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cedula TEXT NOT NULL UNIQUE,
+        photoUri TEXT,
+        phrase TEXT
+      );`
+    );
+  });
+};
+
+const ensureUserProfile = (cedula: string) => {
+  db.transaction(tx => {
+    tx.executeSql(
+      `INSERT OR IGNORE INTO user_profile (cedula) VALUES (?);`,
+      [cedula]
+    );
+  });
+};
+
+const fetchUserProfile = (cedula: string, setPhotoUri: React.Dispatch<React.SetStateAction<string | null>>, setPhrase: React.Dispatch<React.SetStateAction<string | null>>) => {
+  db.transaction(tx => {
+    tx.executeSql(
+      `SELECT photoUri, phrase FROM user_profile WHERE cedula = ?`,
+      [cedula],
+      (_, { rows: { _array } }) => {
+        if (_array.length > 0) {
+          setPhotoUri(_array[0].photoUri);
+          setPhrase(_array[0].phrase);
+        } else {
+          setPhotoUri(null);
+          setPhrase(null);
+        }
+      }
+    );
+  });
+};
+
+const deleteUserProfile = (cedula: string, navigation: any) => {
+  db.transaction(tx => {
+    tx.executeSql(
+      `DELETE FROM user_profile WHERE cedula = ?;`,
+      [cedula],
+      () => {
+        Alert.alert('Usuario eliminado', 'Los datos del usuario han sido eliminados.');
+        navigation.navigate('Login');
+      }
+      
+    );
+  });
+};
 
 export default function ProfileScreen({ navigation }: any) {
   const [cedula, setCedula] = useState('');
@@ -11,7 +68,17 @@ export default function ProfileScreen({ navigation }: any) {
   const [phrase, setPhrase] = useState<string | null>(null);
   const user = useUser(cedula, clave);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (cedula) {
+        fetchUserProfile(cedula, setPhotoUri, setPhrase);
+      }
+    }, [cedula])
+  );
+
   useEffect(() => {
+    initializeDatabase(); // Initialize the database
+
     const loadCredentials = async () => {
       try {
         const storedCedula = await AsyncStorage.getItem('cedula');
@@ -22,6 +89,7 @@ export default function ProfileScreen({ navigation }: any) {
         if (storedCedula !== null && storedClave !== null) {
           setCedula(storedCedula);
           setClave(storedClave);
+          ensureUserProfile(storedCedula); // Ensure user profile exists in the database
         } else {
           console.warn('Credenciales no encontradas en AsyncStorage');
         }
@@ -33,40 +101,13 @@ export default function ProfileScreen({ navigation }: any) {
     loadCredentials();
   }, []);
 
-  useEffect(() => {
-    if (cedula && clave) {
-      console.log('Fetching user with cedula and clave:', cedula, clave);
-    }
-  }, [cedula, clave]);
-
-  useEffect(() => {
-    const loadPhotosAndPhrase = async () => {
-      try {
-        const photos = await getPhotos();
-        if (photos.length > 0) {
-          setPhotoUri(photos[0].photo);
-          setPhrase(photos[0].phrase);
-        }
-      } catch (error) {
-        console.error('Error cargando fotos y frases:', error);
-      }
-    };
-
-    loadPhotosAndPhrase();
-  }, []);
-
-  const deleteUser = async () => {
-    Alert.alert('Usuario eliminado', 'Los datos del usuario han sido eliminados.');
-    navigation.navigate('Login');
-  };
-
   const confirmDeleteUser = () => {
     Alert.alert(
       'Confirmar eliminación',
       '¿Estás seguro de que deseas eliminar todos los datos del usuario?',
       [
         { text: 'Cancelar', style: 'cancel' },
-        { text: 'Eliminar', onPress: deleteUser },
+        { text: 'Eliminar', onPress: () => deleteUserProfile(cedula, navigation) },
       ]
     );
   };
@@ -78,7 +119,7 @@ export default function ProfileScreen({ navigation }: any) {
         <TouchableOpacity 
           activeOpacity={0.5} 
           style={styles.editButton} 
-          onPress={() => navigation.navigate('EditProfile')}
+          onPress={() => navigation.navigate('EditProfile', { cedula })}
         >
           <Image
             source={require('../../assets/edit.png')}
@@ -95,7 +136,7 @@ export default function ProfileScreen({ navigation }: any) {
         <Text style={styles.profileName}>{user?.nombre || 'Nombre'}</Text>
         <Text style={styles.profileID}>{cedula}</Text>
         <View style={styles.card}>
-          <Text style={styles.TextCard}>{phrase || 'Frase no disponible'}</Text>
+          <Text style={styles.TextCard}>{phrase || 'Edita y agrega una frase'}</Text>
         </View>
         <TouchableOpacity style={styles.deleteButton} onPress={confirmDeleteUser}>
           <Text style={styles.deleteButtonText}>Eliminar data</Text>

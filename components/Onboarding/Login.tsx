@@ -25,7 +25,7 @@ export default function Login({ navigation }: any) {
 
         navigation.navigate('MainApp', { cedula, clave });
       } else {
-        Alert.alert('Error', result.mensaje);
+        Alert.alert('Ups ha ocurrido un error :C',(result.mensaje));
       }
     } catch (error) {
       Alert.alert('Error', 'Ocurrió un error al intentar iniciar sesión. Por favor, intente nuevamente.');
