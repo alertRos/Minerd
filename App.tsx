@@ -19,6 +19,7 @@ import { TransitionPresets } from '@react-navigation/stack';
 import * as SplashScreen from 'expo-splash-screen';
 import EditProfile from './components/Profile/editProfile';
 import VisitsCB from './components/VisitsAdd';
+import VisitDetails from './components/VisitsDetails';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -159,6 +160,7 @@ export default function App() {
           />
          <Stack.Screen name="AddVisit" component={VisitsCB} />
          <Stack.Screen name="Visits" component={Visits} />
+         <Stack.Screen name="VisitDetails" component={VisitDetails} />
         </Stack.Navigator>
 
       </NavigationContainer>
