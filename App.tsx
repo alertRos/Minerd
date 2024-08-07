@@ -18,6 +18,8 @@ import CustomHeader from './components/CustomHeader';
 import { TransitionPresets } from '@react-navigation/stack';
 import * as SplashScreen from 'expo-splash-screen';
 import EditProfile from './components/Profile/editProfile';
+import VisitsCB from './components/VisitsAdd';
+import VisitDetails from './components/VisitsDetails';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -34,6 +36,7 @@ export type RootStackParamList = {
   Register: undefined;
   RestorePassword: undefined;
   EditProfile: undefined;
+  Visits: undefined;
 };
 
 type MainTabsProps = {
@@ -155,7 +158,11 @@ export default function App() {
               ...TransitionPresets.BottomSheetAndroid,
             }} 
           />
+         <Stack.Screen name="AddVisit" component={VisitsCB} />
+         <Stack.Screen name="Visits" component={Visits} />
+         <Stack.Screen name="VisitDetails" component={VisitDetails} />
         </Stack.Navigator>
+
       </NavigationContainer>
     </View>
   );
