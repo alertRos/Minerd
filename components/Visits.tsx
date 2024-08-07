@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, Modal } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -9,7 +9,6 @@ import axios from 'axios';
 import { useUser } from './UserService';
 import VisitDetails from './VisitsDetails';
 import { Icon } from 'react-native-paper';
-
 
 type RootStackParamList = {
   Visits: undefined;
@@ -27,7 +26,7 @@ type Visit = {
   code: string;
   type: string;
   foto_evidencia: string;
-  motivo:string;
+  motivo: string;
 };
 
 const MapPopOut = ({ visible, onClose }: { visible: boolean, onClose: () => void }) => {
@@ -40,9 +39,6 @@ const MapPopOut = ({ visible, onClose }: { visible: boolean, onClose: () => void
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Cerrar</Text>
-          </TouchableOpacity>
           <MapView
             style={styles.map}
             initialRegion={{
@@ -61,6 +57,9 @@ const MapPopOut = ({ visible, onClose }: { visible: boolean, onClose: () => void
               description={"Marker Description"}
             />
           </MapView>
+          <TouchableOpacity onPress={onClose} style={{width: 200, height: 40,  marginTop: 20, borderRadius: 12, backgroundColor: '#DC3545', justifyContent: 'center', alignItems: 'center'}}>
+            <Text style={{color: 'white', fontSize: 18, fontWeight: '600'}}>Cerrar</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -103,11 +102,14 @@ const Visits = () => {
     }
   }, [user?.token]);
 
-  useEffect(() => {
-    if (token) {
-      fetchVisitsData();
-    }
-  }, [token]);
+  useFocusEffect(
+    useCallback(() => {
+      console.log('Screen focused, fetching data...');
+      if (token) {
+        fetchVisitsData();
+      }
+    }, [token])
+  );
 
   const fetchVisitsData = async () => {
     try {
@@ -123,7 +125,7 @@ const Visits = () => {
           code: item.cedula_director,
           type: item.motivo,
           foto_evidencia: item.photo,
-          motivo:item.motivo
+          motivo: item.motivo
         }));
         setVisitsData(formattedData);
       } else {
@@ -136,31 +138,37 @@ const Visits = () => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchVisitsData();
+    }, [token])
+  );
+
   const renderItem = ({ item }: { item: Visit }) => (
     <View style={styles.visitItem}>
-      
       <Text style={styles.date}>{item.date}</Text>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.institution}>{item.institution}</Text>
       <Text style={styles.code}>Cod. {item.code}</Text>
       <View style={styles.cardGroup}>
         <Text style={styles.typeE}>{item.type}</Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => {
             setSelectedVisit(item);
             setIsModalVisible(true);
-          }} 
+          }}
           style={styles.detailsButtonContainer}
         >
           <Text style={styles.detailsButton}>Detalles</Text>
-          <Image 
-            source={require('../assets/icons/rowBlue.png')} 
+          <Image
+            source={require('../assets/icons/rowBlue.png')}
             style={styles.icono}
           />
         </TouchableOpacity>
       </View>
     </View>
   );
+
 
   return (
     <View style={styles.container}>
@@ -233,6 +241,7 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     paddingHorizontal: 20,
+    paddingBottom: 130
   },
   visitItem: {
     backgroundColor: '#FFF',
@@ -243,7 +252,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
-    elevation: 2,
+    elevation: 2
   },
   date: {
     fontSize: 14,

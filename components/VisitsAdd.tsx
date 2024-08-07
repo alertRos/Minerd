@@ -10,8 +10,17 @@ import StyleViews from '../assets/Visits';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from './UserService';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 SplashScreen.preventAutoHideAsync();
+
+type RootStackParamList = {
+  Visits: undefined;
+  AddVisit: undefined;
+  VisitDetails: undefined;
+};
+
+type VisitsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Visits'>;
 
 const VisitsCB = () => {
   const [isReady, setIsReady] = useState(false);
@@ -21,6 +30,7 @@ const VisitsCB = () => {
   const [institutionName, setInstitutionName] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
+  const navigation = useNavigation<VisitsScreenNavigationProp>();
   const [directorId, setDirectorId] = useState('');
   const [directorName, setDirectorName] = useState('');
   const [comment, setComment] = useState('');
@@ -31,7 +41,6 @@ const VisitsCB = () => {
   });
   const [cedula, setCedula] = useState('');
   const [clave, setClave] = useState('');
-  const navigation = useNavigation();
   const user = useUser(cedula, clave);
 
   useEffect(() => {
@@ -103,7 +112,8 @@ const VisitsCB = () => {
       const result = await response.json();
 
       if (result.exito) {
-        Alert.alert('Éxito', 'Visita registrada exitosamente');
+        Alert.alert('', 'Visita registrada exitosamente');
+        navigation.navigate('Visits');
       } else {
         Alert.alert('Error', result.mensaje);
       }
