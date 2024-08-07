@@ -11,9 +11,11 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MapView, { Marker } from "react-native-maps";
 import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from '@react-navigation/native';
 
 const VisitDetails = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
 
   return (
     <ScrollView style={{ backgroundColor: "#0071BD" }}>
@@ -29,7 +31,7 @@ const VisitDetails = () => {
       <View style={styles.container}>
         <View style={styles.DateRow}>
           <Text style={styles.date}>12 de Agosto 2024 11:00 AM</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="close" size={35} color="#17202A" />
           </TouchableOpacity>
         </View>
