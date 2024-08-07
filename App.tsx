@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
-import Horoscope from './components/Horoscope';
-import News from './components/News';
-import Visits from './components/Visits';
-import Weather from './components/Weather';
-import Profile from './components/Profile';
-import AddVisit from './components/VisitsAdd';
-import VisitDetails from './components/VisitsDetails';
-import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import { Image, Text } from 'react-native';
-
-=======
 import React, { useEffect, useCallback } from 'react';
 import { Image, Text, View } from 'react-native';
 import { NavigationContainer, RouteProp } from '@react-navigation/native';
@@ -35,11 +18,10 @@ import CustomHeader from './components/CustomHeader';
 import { TransitionPresets } from '@react-navigation/stack';
 import * as SplashScreen from 'expo-splash-screen';
 import EditProfile from './components/Profile/editProfile';
->>>>>>> origin/dev
+import VisitsCB from './components/VisitsAdd';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -53,6 +35,7 @@ export type RootStackParamList = {
   Register: undefined;
   RestorePassword: undefined;
   EditProfile: undefined;
+  Visits: undefined;
 };
 
 type MainTabsProps = {
@@ -153,78 +136,6 @@ export default function App() {
   }
 
   return (
-<<<<<<< HEAD
-    <NavigationContainer>
-      <Tab.Navigator 
-        initialRouteName="Visits"
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconSource;
-
-            switch (route.name) {
-              case 'Visits':
-                iconSource = require('./assets/icons/visits.png');
-                break;
-              case 'Noticias':
-                iconSource = require('./assets/icons/news.png');
-                break;
-              case 'Clima':
-                iconSource = require('./assets/icons/weather.png');
-                break;
-              case 'Horóscopo':
-                iconSource = require('./assets/icons/horoscope.png');
-                break;
-              case 'Perfil':
-                iconSource = require('./assets/icons/profile.png');
-                break;
-              default:
-                iconSource = require('./assets/icons/visits.png');
-                break;
-            }
-
-            return (
-              <Image 
-                source={iconSource} 
-                style={{ width: size, height: size, tintColor: color }} 
-              />
-            );
-          },
-          tabBarLabel: ({ focused, color }) => (
-            <Text style={{ color, fontSize: 12, fontFamily: 'alata-regular', fontWeight: focused ? 'bold' : 'normal', bottom: 16 }}>
-              {route.name}
-            </Text>
-          ),
-          tabBarActiveTintColor: '#DC3545',
-          tabBarInactiveTintColor: 'white',
-          tabBarStyle: {
-            backgroundColor: '#0071BD', 
-            borderTopWidth: 0,
-            position: 'absolute', 
-            elevation: 0, 
-            borderTopRightRadius: 16,
-            borderTopLeftRadius: 16,
-            shadowOpacity: 0, 
-            height: 72, 
-          },
-        })}
-      >
-        <Tab.Screen name="Visits">
-          {() => (
-            <Stack.Navigator>
-              <Stack.Screen name="Visits" component={Visits} options={{ headerShown: false }}/>
-              <Stack.Screen name="AddVisit" component={AddVisit} options={{ headerShown: false }}/>
-              <Stack.Screen name="VisitDetails" component={VisitDetails} options={{ headerShown: false }} />
-            </Stack.Navigator>
-          )}
-        </Tab.Screen>
-        <Tab.Screen name="Noticias" component={News} />
-        <Tab.Screen name="Clima" component={Weather} />
-        <Tab.Screen name="Horóscopo" component={Horoscope} />
-        <Tab.Screen name="Perfil" component={Profile} />
-      </Tab.Navigator>
-    </NavigationContainer>
-=======
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -246,9 +157,11 @@ export default function App() {
               ...TransitionPresets.BottomSheetAndroid,
             }} 
           />
+         <Stack.Screen name="AddVisit" component={VisitsCB} />
+         <Stack.Screen name="Visits" component={Visits} />
         </Stack.Navigator>
+
       </NavigationContainer>
     </View>
->>>>>>> origin/dev
   );
 }

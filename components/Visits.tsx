@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, Modal } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { TextInput } from 'react-native-paper';
 import MapView, { Marker } from 'react-native-maps';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { useUser } from './UserService';
+import VisitDetails from './VisitsDetails';
 
 type RootStackParamList = {
   Visits: undefined;
@@ -21,33 +25,6 @@ type Visit = {
   code: string;
   type: string;
 };
-
-const visitsData: Visit[] = [
-  {
-    id: '1',
-    date: '12 de Agosto 2024',
-    title: 'Cayó un meteorito en la escuela',
-    institution: 'Escuela Nacional Midway',
-    code: '1608',
-    type: 'Inspección',
-  },
-  {
-    id: '2',
-    date: '03 de Julio 2024',
-    title: 'Los maestros reprobaron la...',
-    institution: 'Escuela Nacional Midway',
-    code: '1608',
-    type: 'Evaluación',
-  },
-  {
-    id: '3',
-    date: '26 de Junio 2024',
-    title: 'Se encontró oro en el patio',
-    institution: 'Escuela Infantil Bellota',
-    code: '002',
-    type: 'Inspección',
-  },
-];
 
 const MapPopOut = ({ visible, onClose }: { visible: boolean, onClose: () => void }) => {
   return (
@@ -87,8 +64,69 @@ const MapPopOut = ({ visible, onClose }: { visible: boolean, onClose: () => void
 };
 
 const Visits = () => {
+  const [visitsData, setVisitsData] = useState<Visit[]>([]);
   const [isMapVisible, setIsMapVisible] = useState(false);
   const navigation = useNavigation<VisitsScreenNavigationProp>();
+  const [cedula, setCedula] = useState('');
+  const [clave, setClave] = useState('');
+  const [token, setToken] = useState('');
+  const user = useUser(cedula, clave);
+
+  useEffect(() => {
+    const loadCredentials = async () => {
+      try {
+        const storedCedula = await AsyncStorage.getItem('cedula');
+        const storedClave = await AsyncStorage.getItem('clave');
+        if (storedCedula !== null && storedClave !== null) {
+          setCedula(storedCedula);
+          setClave(storedClave);
+        } else {
+          console.warn('Credenciales no encontradas en AsyncStorage');
+        }
+      } catch (error) {
+        console.error('Error recuperando credenciales:', error);
+      }
+    };
+
+    loadCredentials();
+  }, []);
+
+  useEffect(() => {
+    if (user?.token) {
+      setToken(user.token);
+    }
+  }, [user?.token]);
+
+  useEffect(() => {
+    if (token) {
+      fetchVisitsData();
+    }
+  }, [token]);
+
+  const fetchVisitsData = async () => {
+    try {
+      const response = await axios.get(`https://adamix.net/minerd/def/situaciones.php?token=${token}`);
+      const data = response.data.datos;
+
+      if (data && Array.isArray(data)) {
+        const formattedData = data.map((item: any) => ({
+          id: item.id,
+          date: item.fecha,
+          title: item.motivo,
+          institution: item.codigo_centro,
+          code: item.cedula_director,
+          type: item.motivo,
+        }));
+        setVisitsData(formattedData);
+      } else {
+        setVisitsData([]);
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
+      setVisitsData([]);
+    }
+  };
 
   const renderItem = ({ item }: { item: Visit }) => (
     <View style={styles.visitItem}>
