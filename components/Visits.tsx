@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, Modal } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { TextInput } from 'react-native-paper';
 import MapView, { Marker } from 'react-native-maps';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { useUser } from './UserService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getToken } from './UserService';
 import VisitDetails from './VisitsDetails';
 import { Icon } from 'react-native-paper';
-
 
 type RootStackParamList = {
   Visits: undefined;
@@ -27,7 +25,7 @@ type Visit = {
   code: string;
   type: string;
   foto_evidencia: string;
-  motivo:string;
+  motivo: string;
 };
 
 const MapPopOut = ({ visible, onClose }: { visible: boolean, onClose: () => void }) => {
@@ -75,8 +73,6 @@ const Visits = () => {
   const navigation = useNavigation<VisitsScreenNavigationProp>();
   const [cedula, setCedula] = useState('');
   const [clave, setClave] = useState('');
-  const [token, setToken] = useState('');
-  const user = useUser(cedula, clave);
 
   useEffect(() => {
     const loadCredentials = async () => {
@@ -97,70 +93,68 @@ const Visits = () => {
     loadCredentials();
   }, []);
 
-  useEffect(() => {
-    if (user?.token) {
-      setToken(user.token);
-    }
-  }, [user?.token]);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchVisitsData = async () => {
+        try {
+          const token = await getToken(cedula, clave);
+          if (!token) {
+            console.log('Token no disponible');
+            return;
+          }
+          const response = await axios.get(`https://adamix.net/minerd/def/situaciones.php?token=${token}`);
+          const data = response.data.datos;
 
-  useEffect(() => {
-    if (token) {
+          if (data && Array.isArray(data) && data.length > 0) {
+            const formattedData = data.map((item: any) => ({
+              id: item.id,
+              date: item.fecha,
+              title: item.motivo,
+              institution: item.codigo_centro,
+              code: item.cedula_director,
+              type: item.motivo,
+              foto_evidencia: item.photo,
+              motivo: item.motivo
+            }));
+            setVisitsData(formattedData);
+          } else {
+            setVisitsData([]);
+          }
+        } catch (error) {
+          console.error('Error', error);
+          setVisitsData([]);
+        }
+      };
+
       fetchVisitsData();
-    }
-  }, [token]);
-
-  const fetchVisitsData = async () => {
-    try {
-      const response = await axios.get(`https://adamix.net/minerd/def/situaciones.php?token=${token}`);
-      const data = response.data.datos;
-
-      if (data && Array.isArray(data)) {
-        const formattedData = data.map((item: any) => ({
-          id: item.id,
-          date: item.fecha,
-          title: item.motivo,
-          institution: item.codigo_centro,
-          code: item.cedula_director,
-          type: item.motivo,
-          foto_evidencia: item.photo,
-          motivo:item.motivo
-        }));
-        setVisitsData(formattedData);
-      } else {
-        setVisitsData([]);
-      }
-
-    } catch (error) {
-      console.error('Error:', error);
-      setVisitsData([]);
-    }
-  };
+    }, [cedula, clave])
+  );
 
   const renderItem = ({ item }: { item: Visit }) => (
     <View style={styles.visitItem}>
-      
       <Text style={styles.date}>{item.date}</Text>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.institution}>{item.institution}</Text>
       <Text style={styles.code}>Cod. {item.code}</Text>
       <View style={styles.cardGroup}>
         <Text style={styles.typeE}>{item.type}</Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => {
             setSelectedVisit(item);
             setIsModalVisible(true);
-          }} 
+          }}
           style={styles.detailsButtonContainer}
         >
           <Text style={styles.detailsButton}>Detalles</Text>
-          <Image 
-            source={require('../assets/icons/rowBlue.png')} 
+          <Image
+            source={require('../assets/icons/rowBlue.png')}
             style={styles.icono}
           />
         </TouchableOpacity>
       </View>
     </View>
   );
+
 
   return (
     <View style={styles.container}>

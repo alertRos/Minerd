@@ -37,3 +37,19 @@ export const useUser = (cedula: string, clave: string) => {
   return user;
 };
 
+export const getToken = async (cedula: string, clave: string): Promise<string | ''> => {
+  try {
+    const response = await fetch(`https://adamix.net/minerd/def/iniciar_sesion.php?cedula=${cedula}&clave=${clave}`);
+    const result = await response.json();
+
+    if (result.exito) {
+      return result.datos.token;
+    } else {
+      console.error('Error:', result.mensaje);
+      return '';
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return '';
+  }
+};
