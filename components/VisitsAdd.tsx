@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import StyleViews from '../assets/Visits';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from './UserService';
+import { useNavigation } from '@react-navigation/native';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,6 +31,7 @@ const VisitsCB = () => {
   });
   const [cedula, setCedula] = useState('');
   const [clave, setClave] = useState('');
+  const navigation = useNavigation();
   const user = useUser(cedula, clave);
 
   useEffect(() => {
@@ -116,7 +118,7 @@ const VisitsCB = () => {
       <View style={StyleViews.Testt}>
         <View style={StyleViews.dateCloseRow}>
           <Text style={[StyleViews.date, { fontFamily: 'Alata_400Regular' }]}>14 de Agosto 2024 03:42 PM</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="close" size={35} color="#17202A" />
           </TouchableOpacity>
         </View>

@@ -160,7 +160,6 @@ export default function App() {
           />
          <Stack.Screen name="AddVisit" component={VisitsCB} />
          <Stack.Screen name="Visits" component={Visits} />
-         <Stack.Screen name="VisitDetails" component={VisitDetails} />
         </Stack.Navigator>
 
       </NavigationContainer>

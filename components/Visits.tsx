@@ -7,7 +7,7 @@ import MapView, { Marker } from 'react-native-maps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useUser } from './UserService';
-import VisitDetails from './VisitsDetails';
+import VisitDetails from './VisitsDetails'; // Asegúrate de que la importación esté correcta
 
 type RootStackParamList = {
   Visits: undefined;
@@ -66,6 +66,8 @@ const MapPopOut = ({ visible, onClose }: { visible: boolean, onClose: () => void
 const Visits = () => {
   const [visitsData, setVisitsData] = useState<Visit[]>([]);
   const [isMapVisible, setIsMapVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
   const navigation = useNavigation<VisitsScreenNavigationProp>();
   const [cedula, setCedula] = useState('');
   const [clave, setClave] = useState('');
@@ -136,7 +138,13 @@ const Visits = () => {
       <Text style={styles.code}>Cod. {item.code}</Text>
       <View style={styles.cardGroup}>
         <Text style={styles.typeE}>{item.type}</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('VisitDetails')} style={styles.detailsButtonContainer}>
+        <TouchableOpacity 
+          onPress={() => {
+            setSelectedVisit(item);
+            setIsModalVisible(true);
+          }} 
+          style={styles.detailsButtonContainer}
+        >
           <Text style={styles.detailsButton}>Detalles</Text>
           <Image 
             source={require('../assets/icons/rowBlue.png')} 
@@ -156,12 +164,6 @@ const Visits = () => {
           <Image source={require('../assets/icons/map.png')} style={styles.editImage} />
         </TouchableOpacity>
       </View>
-      <TextInput 
-        mode="outlined"
-        placeholder="Buscar"
-        right={<TextInput.Icon icon={"magnify"} color={"gray"}/>}
-        style={styles.input}
-      />
       <FlatList
         data={visitsData}
         renderItem={renderItem}
@@ -176,6 +178,15 @@ const Visits = () => {
       </TouchableOpacity>
 
       <MapPopOut visible={isMapVisible} onClose={() => setIsMapVisible(false)} />
+      
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <VisitDetails visit={selectedVisit} onClose={() => setIsModalVisible(false)} />
+      </Modal>
     </View>
   );
 };
@@ -183,125 +194,119 @@ const Visits = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
+    backgroundColor: '#F5F5F5',
     paddingTop: 20,
   },
-  icono: {
-    width: 20,
-    height: 20,
-  },
   logo: {
-    width: 200,
-    height: 100,
+    width: 150,
+    height: 50,
     resizeMode: 'contain',
-    marginTop: 20,
+    alignSelf: 'center',
   },
   titleGroup: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  input: {
-    height: 44,
-    width: '100%',
-    marginVertical: 8,
-    fontFamily: 'alata-regular',
-    fontSize: 24,
+    marginHorizontal: 20,
+    marginVertical: 10,
   },
   perfilText: {
-    fontSize: 24,
-    fontWeight: '400',
-    lineHeight: 33.12,
-    color: '#17202A',
-    fontFamily: 'alata-regular',
-    flex: 1,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#0071BD',
   },
   editButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#0071BD',
+    padding: 10,
+    borderRadius: 50,
   },
   editImage: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
+    tintColor: '#fff',
+  },
+  flatListContent: {
+    paddingHorizontal: 20,
   },
   visitItem: {
-    marginBottom: 20,
-    padding: 20,
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    backgroundColor: '#FFF',
+    padding: 15,
+    marginVertical: 10,
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowRadius: 5,
     elevation: 2,
-  },
-  cardGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 20,
-    marginBottom: 20,
   },
   date: {
     fontSize: 14,
-    color: '#888',
-    marginBottom: 5,
+    color: '#777',
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 5,
+    color: '#333',
+    marginTop: 5,
   },
   institution: {
-    fontSize: 16,
-    marginBottom: 5,
+    fontSize: 14,
+    color: '#555',
+    marginTop: 5,
   },
   code: {
     fontSize: 14,
-    color: '#888',
-    marginBottom: 5,
+    color: '#555',
+    marginTop: 5,
+  },
+  cardGroup: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
   },
   typeE: {
-    fontSize: 16,
-    color: '#F4D03F',
-    textAlign: 'center',
-  },
-  typeI: {
-    fontSize: 16,
-    color: '#f00',
-    textAlign: 'center',
+    fontSize: 14,
+    color: '#0071BD',
+    fontWeight: 'bold',
   },
   detailsButtonContainer: {
-    borderColor: '#0071BD', // Borde azul
-    borderWidth: 1,
-    borderRadius: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
     flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0071BD',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
   },
   detailsButton: {
-    fontSize: 16,
-    color: '#007bff',
+    fontSize: 14,
+    color: '#fff',
+    marginRight: 5,
+  },
+  icono: {
+    width: 15,
+    height: 15,
+    tintColor: '#fff',
   },
   addButton: {
-    position: 'absolute',
-    bottom: 100,
-    right: 30,
-    backgroundColor: '#DC3545',
+    backgroundColor: '#0071BD',
     width: 60,
     height: 60,
-    borderRadius: 10,
-    alignItems: 'center',
+    borderRadius: 30,
     justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 5,
   },
   addButtonText: {
-    fontSize: 34,
+    fontSize: 36,
     color: '#fff',
-  },
-  flatListContent: {
-    paddingBottom: 80, // Ajusta este valor según el tamaño de tu bottom navbar
   },
   modalOverlay: {
     flex: 1,
@@ -322,12 +327,6 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontSize: 18,
     color: '#007bff',
-  },
-  mapImage: {
-    width: '100%',
-    height: 300,
-    resizeMode: 'contain',
-    marginTop: 20,
   },
   map: {
     width: '100%',
