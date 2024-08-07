@@ -1,13 +1,76 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../UserService';
+import { getPhotos } from '../data/db';
 
 export default function ProfileScreen({ navigation }: any) {
   const [cedula, setCedula] = useState('');
   const [clave, setClave] = useState('');
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [phrase, setPhrase] = useState<string | null>(null);
   const user = useUser(cedula, clave);
-  
+
+  useEffect(() => {
+    const loadCredentials = async () => {
+      try {
+        const storedCedula = await AsyncStorage.getItem('cedula');
+        const storedClave = await AsyncStorage.getItem('clave');
+        console.log('Stored Cedula:', storedCedula);
+        console.log('Stored Clave:', storedClave);
+
+        if (storedCedula !== null && storedClave !== null) {
+          setCedula(storedCedula);
+          setClave(storedClave);
+        } else {
+          console.warn('Credenciales no encontradas en AsyncStorage');
+        }
+      } catch (error) {
+        console.error('Error recuperando credenciales:', error);
+      }
+    };
+
+    loadCredentials();
+  }, []);
+
+  useEffect(() => {
+    if (cedula && clave) {
+      console.log('Fetching user with cedula and clave:', cedula, clave);
+    }
+  }, [cedula, clave]);
+
+  useEffect(() => {
+    const loadPhotosAndPhrase = async () => {
+      try {
+        const photos = await getPhotos();
+        if (photos.length > 0) {
+          setPhotoUri(photos[0].photo);
+          setPhrase(photos[0].phrase);
+        }
+      } catch (error) {
+        console.error('Error cargando fotos y frases:', error);
+      }
+    };
+
+    loadPhotosAndPhrase();
+  }, []);
+
+  const deleteUser = async () => {
+    Alert.alert('Usuario eliminado', 'Los datos del usuario han sido eliminados.');
+    navigation.navigate('Login');
+  };
+
+  const confirmDeleteUser = () => {
+    Alert.alert(
+      'Confirmar eliminación',
+      '¿Estás seguro de que deseas eliminar todos los datos del usuario?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Eliminar', onPress: deleteUser },
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.titlegroup}>
@@ -24,13 +87,17 @@ export default function ProfileScreen({ navigation }: any) {
         </TouchableOpacity>
       </View>
       <View style={styles.profiledata}>
-        <Image source={require('../../assets/profileimage.png')} style={styles.profileImg} />
+        {photoUri ? (
+          <Image source={{ uri: photoUri }} style={styles.profileImg} />
+        ) : (
+          <Image source={require('../../assets/perfildefault.png')} style={styles.profileImg} />
+        )}
         <Text style={styles.profileName}>{user?.nombre || 'Nombre'}</Text>
         <Text style={styles.profileID}>{cedula}</Text>
         <View style={styles.card}>
-          <Text style={styles.TextCard}>“Que Leny no toque mis diseños”</Text>
+          <Text style={styles.TextCard}>{phrase || 'Frase no disponible'}</Text>
         </View>
-        <TouchableOpacity style={styles.deleteButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.deleteButton} onPress={confirmDeleteUser}>
           <Text style={styles.deleteButtonText}>Eliminar data</Text>
         </TouchableOpacity>
       </View>
@@ -38,13 +105,11 @@ export default function ProfileScreen({ navigation }: any) {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: 20,
-
   },
   titlegroup: {
     flexDirection: 'row',
@@ -63,7 +128,7 @@ const styles = StyleSheet.create({
     color: '#17202A',
     fontFamily: 'Alata-Regular',
     flex: 1,
-    marginLeft:20
+    marginLeft: 20,
   },
   editButton: {
     justifyContent: 'center',
@@ -100,8 +165,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     shadowColor: '#1E1E1E',
     shadowOffset: {
-        width: 0,
-        height: 2,
+      width: 0,
+      height: 2,
     },
     shadowOpacity: 0.8,
     shadowRadius: 6,
