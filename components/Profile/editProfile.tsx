@@ -28,7 +28,7 @@ const updateUserProfile = (cedula: string, photoUri: string | null, phrase: stri
       `UPDATE user_profile SET photoUri = ?, phrase = ? WHERE cedula = ?;`,
       [photoUri, phrase, cedula],
       () => {
-        Alert.alert('Perfil actualizado', 'Tu perfil ha cambiado :)');
+        Alert.alert('', 'Tu perfil ha cambiado');
       }
     );
   });

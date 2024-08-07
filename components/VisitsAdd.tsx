@@ -10,17 +10,8 @@ import StyleViews from '../assets/Visits';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from './UserService';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 
 SplashScreen.preventAutoHideAsync();
-
-type RootStackParamList = {
-  Visits: undefined;
-  AddVisit: undefined;
-  VisitDetails: undefined;
-};
-
-type VisitsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Visits'>;
 
 const VisitsCB = () => {
   const [isReady, setIsReady] = useState(false);
@@ -30,7 +21,6 @@ const VisitsCB = () => {
   const [institutionName, setInstitutionName] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
-  const navigation = useNavigation<VisitsScreenNavigationProp>();
   const [directorId, setDirectorId] = useState('');
   const [directorName, setDirectorName] = useState('');
   const [comment, setComment] = useState('');
@@ -41,6 +31,7 @@ const VisitsCB = () => {
   });
   const [cedula, setCedula] = useState('');
   const [clave, setClave] = useState('');
+  const navigation = useNavigation();
   const user = useUser(cedula, clave);
 
   useEffect(() => {
@@ -70,15 +61,18 @@ const VisitsCB = () => {
   }, []);
 
   const requestPermissions = async () => {
+    console.log('Requesting media library permissions...');
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permisos insuficientes', 'Necesitamos acceso a tu galería para seleccionar una imagen.');
       return false;
     }
+    console.log('Media library permissions granted');
     return true;
   };
 
   const pickImage = async () => {
+    console.log('Picking image...');
     const hasPermission = await requestPermissions();
     if (!hasPermission) return;
 
@@ -90,34 +84,45 @@ const VisitsCB = () => {
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
+      console.log('Image picked:', result.assets[0].uri);
       setImageUri(result.assets[0].uri);
+    } else {
+      console.log('Image picking cancelled');
     }
   };
 
   const pickAudio = async () => {
+    console.log('Picking audio...');
     let result = await DocumentPicker.getDocumentAsync({
       type: 'audio/*',
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
+      console.log('Audio picked:', result.assets[0].uri);
       setAudioUri(result.assets[0].uri);
+    } else {
+      console.log('Audio picking cancelled');
     }
   };
 
   const registerVisit = async () => {
     const url = `https://adamix.net/minerd/minerd/registrar_visita.php?cedula_director=${directorId}&codigo_centro=${institutionCode}&motivo=${motivoCode}&foto_evidencia=${encodeURIComponent(imageUri)}&comentario=${encodeURIComponent(comment)}&nota_voz=${encodeURIComponent(audioUri)}&latitud=${latitude}&longitud=${longitude}&fecha=2024-08-14&hora=15:42&token=${user?.token}`;
 
+    console.log('Registering visit with URL:', url);
+
     try {
       const response = await fetch(url);
       const result = await response.json();
 
+      console.log('API response:', result);
+
       if (result.exito) {
-        Alert.alert('', 'Visita registrada exitosamente');
-        navigation.navigate('Visits');
+        Alert.alert('Éxito', 'Visita registrada exitosamente');
       } else {
         Alert.alert('Error', result.mensaje);
       }
     } catch (error) {
+      console.error('Error registrando visita:', error);
       Alert.alert('Error', 'Hubo un problema al registrar la visita');
     }
   };
@@ -212,14 +217,13 @@ const VisitsCB = () => {
             <TouchableOpacity style={StyleViews.fileButton} onPress={pickAudio}>
               <Image source={require('../assets/icons/headphones.png')} />
             </TouchableOpacity>
-
           </View>
           <View style={StyleViews.imageSection}>
-          {imageUri ? (
-                <Image source={{ uri: imageUri }} style={{ width: '100%', height: '100%' }} />
-              ) : (
-                <Image source={require('../assets/icons/image.png')} style={{width:450,height:350}}/>
-              )}
+            {imageUri ? (
+              <Image source={{ uri: imageUri }} style={{ width: '100%', height: '100%' }} />
+            ) : (
+              <Image source={require('../assets/icons/image.png')} style={{width:450,height:350}}/>
+            )}
           </View>
           <TouchableOpacity style={StyleViews.saveButton} onPress={registerVisit}>
             <Text style={StyleViews.saveButtonText}>Registrar</Text>
